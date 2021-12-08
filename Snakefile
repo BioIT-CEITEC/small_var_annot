@@ -1,19 +1,48 @@
 import os
 import pandas as pd
+import json
+from snakemake.utils import min_version
 
-GLOBAL_REF_PATH = "/mnt/ssd/ssd_3/references"
-# JSON validation, only the description and parameters part, not the samples part
-# from snakemake.utils import validate
-#validate(config, "config.schema.json")
+min_version("5.18.0")
 
-####################################
-# FOLDERS
+GLOBAL_REF_PATH = "/mnt/references/"
+
+# Reference processing
+#
+config["material"] = "DNA"
+if config["lib_ROI"] != "wgs" or config["lib_ROI"] != "RNA":
+    # setting reference from lib_ROI
+    f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
+    lib_ROI_dict = json.load(f)
+    f.close()
+    config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
+else:
+    if config["lib_ROI"] != "RNA":
+        config["material"] = "RNA"
+        config["lib_ROI"] = "wgs"
+
+# setting organism from reference
+f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference.json"),)
+reference_dict = json.load(f)
+f.close()
+config["organism"] = [organism_name.lower().replace(" ","_") for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].keys()][0]
+
+##### Config processing #####
+# Folders
 #
 reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["reference"])
 
-##### Config processing #####
-
+# Samples
+#
 sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
+
+# if not config["is_paired"]:
+#     read_pair_tags = [""]
+#     paired = "SE"
+# else:
+#     read_pair_tags = ["_R1","_R2"]
+#     paired = "PE"
+
 
 
 callers = config["callers"].split(';')
@@ -30,7 +59,8 @@ if not "not_use_merged" in config:
 wildcard_constraints:
     vartype = "snvs|indels",
     sample = "|".join(sample_tab.sample_name),
-    sample_pair = "tumor|normal"
+    lib_name = "[^\.\/]+",
+    read_pair_tag = "(_R.)?"
 
 
 
@@ -38,7 +68,7 @@ wildcard_constraints:
 ####################################
 # SEPARATE RULES
 include: "rules/callers.smk"
-include: "rules/somaticseq.smk"
+include: "rules/variant_merging.smk"
 include: "rules/annotate.smk"
 include: "rules/variant_postprocessing.smk"
 

@@ -13,7 +13,6 @@ f.close()
 command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_format_annot_variants.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.all_vars_tsv + " " +\
-            snakemake.output.mut_loads + " " +\
             os.path.dirname(snakemake.output.per_sample_var_tabs[0]) + " " +\
             snakemake.input.format_file + " " +\
             snakemake.params.min_variant_frequency + " " +\

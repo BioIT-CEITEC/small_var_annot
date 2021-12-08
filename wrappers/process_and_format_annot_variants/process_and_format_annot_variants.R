@@ -35,11 +35,10 @@ run_all <- function(args){
   #read all params as variables
   annot_file <- args[1]
   output_file <- args[2]
-  mut_load_output_file <- args[3]
-  per_sample_results_dir <- args[4]
-  format_file <- args[5]
-  VF_threshold <- as.numeric(args[6]) / 100  
-  var_files <- args[7:length(args)]
+  per_sample_results_dir <- args[3]
+  format_file <- args[4]
+  VF_threshold <- as.numeric(args[5]) / 100
+  var_files <- args[6:length(args)]
 
   
   #load format config file
@@ -54,17 +53,11 @@ run_all <- function(args){
   annot_tab <- fread(annot_file)
   
   #load and filter vars from all samples
-  sample_filename_pattern <- paste0(".*\\/(.*).variants.tsv")
+  sample_filename_pattern <- paste0(".*\\/(.*).processed.tsv")
   all_var_tab <- fread_vector_of_files(var_files,regex = sample_filename_pattern)
   all_var_tab <- filter_variants(all_var_tab,VF_threshold = VF_threshold)
   
   final_unformated_tab <- merge(all_var_tab,annot_tab,by = "var_name",allow.cartesian=TRUE)
-  
-  if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO")){
-    compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs)
-  } else {
-    system(paste0("touch ",mut_load_output_file))
-  }
   
   #keep only cols in config which are in the final table
   col_config <- col_config[orig_name %in% names(final_unformated_tab)]
@@ -89,11 +82,11 @@ run_all <- function(args){
 
 filter_variants <- function(all_var_tab,VF_threshold = 0,coverage_alarm = c(1,10,40),single_transcript = T){
   
-  all_var_tab <- all_var_tab[tumor_variant_freq > VF_threshold,]
+  all_var_tab <- all_var_tab[variant_freq > VF_threshold,]
   all_var_tab[,alarm := ""]
-  all_var_tab[tumor_depth < coverage_alarm[3],alarm := "Low coverage"]
-  all_var_tab[tumor_depth < coverage_alarm[2],alarm := "Very low coverage"]
-  all_var_tab[tumor_depth < coverage_alarm[1],alarm := "No coverage"]
+  all_var_tab[coverage_depth < coverage_alarm[3],alarm := "Low coverage"]
+  all_var_tab[coverage_depth < coverage_alarm[2],alarm := "Very low coverage"]
+  all_var_tab[coverage_depth < coverage_alarm[1],alarm := "No coverage"]
   
   return(all_var_tab)
 }
@@ -228,10 +221,10 @@ empty_sample_names <<- character()
 
 # develop and test
 # setwd("/mnt/ssd/ssd_1/snakemake/stage359_PC.seq_A/somatic_variant_calling")
-# args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","/home/98640/BioRoots/workflows/paired_somatic_small_var_call/resources/formats/default_new.txt","0","somatic_seq_results/Pca_4.variants.tsv","somatic_seq_results/Pca_5.variants.tsv","somatic_seq_results/Pca_6.variants.tsv","somatic_seq_results/Pca_7.variants.tsv","somatic_seq_results/Pca_8.variants.tsv","somatic_seq_results/Pca_10.variants.tsv","somatic_seq_results/Pca_11.variants.tsv","somatic_seq_results/Pca_12.variants.tsv","somatic_seq_results/Pca_13.variants.tsv","somatic_seq_results/Pca_17.variants.tsv","somatic_seq_results/Pca_18.variants.tsv","somatic_seq_results/Pca_19.variants.tsv","somatic_seq_results/Pca_20.variants.tsv","somatic_seq_results/Pca_21.variants.tsv","somatic_seq_results/Pca_22.variants.tsv","somatic_seq_results/Pca_23.variants.tsv","somatic_seq_results/Pca_24.variants.tsv","somatic_seq_results/Pca_25.variants.tsv","somatic_seq_results/Pca_26.variants.tsv")
+# setwd("/mnt/ssd/ssd_1/sequia/211206__germline_small_var_call__1332")
+# args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","~/BioRoots/germline_small_var_call/resources/formats/default.txt","25","merged/BR-1052.processed.tsv","merged/BR-1053.processed.tsv","merged/BR-1054.processed.tsv","merged/BR-1055.processed.tsv","merged/BR-1056.processed.tsv","merged/BR-1060.processed.tsv","merged/BR-1061.processed.tsv","merged/BR-1062.processed.tsv","merged/BR-1063.processed.tsv","merged/BR-1064.processed.tsv","merged/BR-1065.processed.tsv","merged/BR-1066.processed.tsv","merged/H-0381.processed.tsv","merged/H-0388.processed.tsv","merged/H-0389.processed.tsv","merged/H-0397.processed.tsv")
 
 #run as Rscript
-# 
 args <- commandArgs(trailingOnly = T)
 run_all(args)
 

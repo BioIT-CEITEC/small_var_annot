@@ -13,13 +13,13 @@ f.close()
 
 shell.executable("/bin/bash")
 
-version = str(subprocess.Popen("configureStrelkaSomaticWorkflow.py --version 2>&1", shell=True, stdout=subprocess.PIPE).communicate()[0], 'utf-8')
+version = str(subprocess.Popen("configureStrelkaGermlineWorkflow.py --version 2>&1", shell=True, stdout=subprocess.PIPE).communicate()[0], 'utf-8')
 f = open(log_filename, 'at')
 f.write("## VERSION: strelka "+version+"\n")
 f.close()
 
 #not implemented --targeted
-if snakemake.params.library_scope == "wgs" or snakemake.params.sample_material == "RNA":
+if snakemake.params.lib_ROI == "wgs":
     scope = ""
 else:
     scope = " --exome --callRegions " + snakemake.input.regions_gz + " "
@@ -27,24 +27,13 @@ else:
 
 shell("rm -fR " + snakemake.params.dir)
 
-if snakemake.params.calling_type == "paired":
-    command = "configureStrelkaSomaticWorkflow.py" + \
-              scope + \
-              " --normalBam " + snakemake.input.normal + \
-              " --tumorBam " + snakemake.input.tumor + \
-              " --referenceFasta " + snakemake.input.ref + \
-              " --runDir " + snakemake.params.dir + \
-              " --disableEVS " + \
-              " >> " + log_filename + " 2>&1"
-else:
-    command = "configureStrelkaGermlineWorkflow.py" + \
-              scope + \
-              " --bam " + snakemake.input.tumor + \
-              " --referenceFasta " + snakemake.input.ref + \
-              " --runDir " + snakemake.params.dir + \
-              " >> " + log_filename + " 2>&1"
 
-
+command = "configureStrelkaGermlineWorkflow.py" + \
+          scope + \
+          " --bam " + snakemake.input.bam + \
+          " --referenceFasta " + snakemake.input.ref + \
+          " --runDir " + snakemake.params.dir + \
+          " >> " + log_filename + " 2>&1"
 
 f = open(log_filename, 'at')
 f.write("## COMMAND: "+command+"\n")
@@ -54,6 +43,20 @@ shell(command)
 command = snakemake.params.dir + "/runWorkflow.py -m local -j " + str(snakemake.threads) + " >> " + log_filename + " 2>&1"
 
 f = open(log_filename, 'at')
+f.write("## COMMAND: "+command+"\n")
+f.close()
+shell(command)
+
+command = "cp " + snakemake.params.vcf + " " + snakemake.output.vcf + ".gz"
+
+f = open(log_filename, 'a+')
+f.write("## COMMAND: "+command+"\n")
+f.close()
+shell(command)
+
+command = "gunzip " + snakemake.output.vcf + ".gz"
+
+f = open(log_filename, 'a+')
 f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
@@ -72,16 +75,4 @@ shell(command)
 # shell(command)
 
 
-# command =  "cp " + snakemake.params.dir + "/results/variants/somatic.indels.vcf.gz " + str(snakemake.output.vcf) + ".gz"
-#
-# f = open(log_filename, 'a+')
-# f.write("## COMMAND: "+command+"\n")
-# f.close()
-# shell(command)
-#
-# command =  "gunzip " + str(snakemake.output.vcf) + ".gz"
-#
-# f = open(log_filename, 'a+')
-# f.write("## COMMAND: "+command+"\n")
-# f.close()
-# shell(command)
+
