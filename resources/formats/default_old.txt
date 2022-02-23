@@ -1,7 +1,5 @@
 rounding=3
 percentage=FALSE
-mut_load=normal::/mnt/ssd/ssd_3/references/homsap/GRCh37-p13/intervals/mut_loads/exome_CDS_sorted_merged_nochr_sl2.bed::tumor_variant_freq > 0.05 & VARIANT_CLASS == "SNV" & Consequence != "synonymous_variant"
-mut_load=foundation_one::/mnt/ssd/ssd_3/references/homsap/GRCh37-p13/intervals/mut_loads/FO_CDS_sorted_merged_nochr.bed::tumor_variant_freq > 0.05
 sort_by=-is_protein_coding,consequence_index,-CANONICAL
 
 per_col_config:
@@ -30,15 +28,8 @@ HGMD	HGMD
 NHLBI_ESP	NHLBI_ESP
 CLNSIG	clinvar_sig
 CLNDN	clinvar_DBN
-custom_DB::fOne	fOne
-custom_DB::md-anderson	md-anderson
-custom_DB::trusight_genes	trusight_genes
-custom_DB::CGC__Somatic	CGC_Somatic
-custom_DB::CGC__Tumour_Somatic	CGC_Tumour_Somatic
 PolyPhen	PolyPhen
 SIFT	SIFT
-CADD_RAW	CADD_RAW
-CADD_PHRED	CADD_PHRED
 gene_region	gene_region
 IMPACT	IMPACT
 Consequence	Consequence
