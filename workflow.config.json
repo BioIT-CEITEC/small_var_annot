@@ -1,9 +1,9 @@
 {
   "workflow_description": {
-    "name":"somatic_small_var_call",
+    "name":"germline_small_var_call",
     "version": 1.0,
-    "label":"Somatic small variant calling test",
-    "type":"somatic_small_var_call",
+    "label":"Germline small variant calling 03032022",
+    "type":"germline_small_var_call",
     "inputs":[
       "mapped/{sample}.bam*"
     ],
