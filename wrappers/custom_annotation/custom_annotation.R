@@ -73,7 +73,7 @@ add_custom_DB <- function(tab,custom_DBs){
   for(DB_text in custom_DBs){
     DB_name_split <- strsplit(DB_text,":")[[1]]
     DB_name <- DB_name_split[1]
-    DB_filename <- list.files("/mnt/ssd/ssd_3/references/homsap/GRCh37-p13/annot/custom",pattern = DB_name,full.names = T)
+    DB_filename <- list.files("/mnt/references/homsap/GRCh37-p13/annot/custom",pattern = DB_name,full.names = T)
     if(length(DB_filename) == 1){
       orig_DB <- fread(DB_filename)
       DB <- orig_DB[, c(T,lapply(orig_DB[,-1,with = FALSE], is.numeric) == TRUE), with = FALSE]
