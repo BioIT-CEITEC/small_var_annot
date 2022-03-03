@@ -34,7 +34,7 @@ rule variant_annotation:
 
 rule custom_annotation:
     input:  annotated = "annotate/all_variants.annotated.tsv",
-            format_file = workflow.basedir + "/resources/formats/" + config["format_name"] + ".txt",
+            format_file = workflow.basedir + "/resources/formats/" + config["format"] + ".txt",
     output: custom_annotated = "annotate/all_variants.annotated.processed.tsv"
     log:    "logs/custom_annotation.log"
     threads: 10
