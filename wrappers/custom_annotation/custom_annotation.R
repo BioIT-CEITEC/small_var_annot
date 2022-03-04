@@ -64,7 +64,7 @@ extract_existing_variations_to_separate_cols <- function(Existing_variation_vect
 }
 
 
-add_custom_DB <- function(tab,custom_DBs){
+add_custom_DB <- function(tab,custom_DBs,custom_DB_folder){
   location_tab <- as.data.table(tstrsplit(tab$var_name,"_",names = c("chrom","pos","t"),type.convert = T)[1:2])
   location_tab[,type := "b_var"][,index := seq_along(type)]
   setorder(location_tab)
@@ -73,7 +73,7 @@ add_custom_DB <- function(tab,custom_DBs){
   for(DB_text in custom_DBs){
     DB_name_split <- strsplit(DB_text,":")[[1]]
     DB_name <- DB_name_split[1]
-    DB_filename <- list.files("/mnt/ssd/ssd_3/references/homsap/GRCh37-p13/annot/custom",pattern = DB_name,full.names = T)
+    DB_filename <- list.files(custom_DB_folder,pattern = DB_name,full.names = T)
     if(length(DB_filename) == 1){
       orig_DB <- fread(DB_filename)
       DB <- orig_DB[, c(T,lapply(orig_DB[,-1,with = FALSE], is.numeric) == TRUE), with = FALSE]
@@ -114,7 +114,7 @@ add_custom_DB <- function(tab,custom_DBs){
 }
 
 
-load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,resources_dir){
+load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,resources_dir,custom_DB_folder,gtf_file){
   
   #READ ANNOTATION TABLE
   annot_tab <- fread(annot_file,sep = "\t",header = T,skip = "#Uploaded_variation",verbose = F,showProgress = F)
@@ -259,7 +259,7 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
       custom_DBs[grepl("__",orig_name),cols := paste(gsub(".*__","",orig_name),collapse = "+"),by = DB]
       custom_DBs[,input := paste(DB,cols,sep = ":")]
       custom_DBs[,input := gsub("\\:$","",input)]
-      add_custom_DB(annot_tab,unique(custom_DBs$input))
+      add_custom_DB(annot_tab,unique(custom_DBs$input),custom_DB_folder)
     } 
     
     if(any(col_config$orig_name == "exon_dist") && file.exists(gtf_file)){
@@ -308,13 +308,15 @@ run_all <- function(args){
   ref_name <- args[3]
   gtf_file <- args[4]
   resources_dir <- args[5]
-  format_file <- args[6]
-  
+  custom_DB_folder <- args[6]
+  format_file <- args[7]
+
+
   ref_name <- gsub("\\-.*","",ref_name)
   
   col_config <- fread(format_file,skip = "orig_name")
   #load and process annotated vars
-  annot_tab <- load_and_process_annot_tab(annot_file,ref_name,col_config,resources_dir)
+  annot_tab <- load_and_process_annot_tab(annot_file,ref_name,col_config,resources_dir,custom_DB_folder,gtf_file)
   
   fwrite(annot_tab,file = output_file,sep = "\t")
 }

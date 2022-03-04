@@ -1,9 +1,9 @@
 {
   "workflow_description": {
-    "name":"somatic_small_var_call",
+    "name":"germline_small_var_call",
     "version": 1.0,
-    "label":"Somatic small variant calling test",
-    "type":"somatic_small_var_call",
+    "label":"Germline small variant calling",
+    "type":"germline_small_var_call",
     "inputs":[
       "mapped/{sample}.bam*"
     ],
@@ -50,9 +50,19 @@
     },
     "detailed": {
       "min_variant_frequency": {
-        "label": "Minimal variant frequency to report",
+        "label": "Minimal variant frequency to report in percent",
         "type": "int",
         "default": 25
+      },
+      "min_var_reads_threshold": {
+        "label": "Minimal number of variant reads to report variant.",
+        "type": "int",
+        "default": 5
+      },
+      "min_callers_threshold": {
+        "label": "Minimal number callers to call the variant.",
+        "type": "int",
+        "default": 1
       }
     },
     "samples": {

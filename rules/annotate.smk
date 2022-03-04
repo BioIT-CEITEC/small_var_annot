@@ -24,7 +24,7 @@ rule variant_annotation:
             vep_dir = expand("{ref_dir}/annot/vep",ref_dir = reference_directory)[0],
             ref_name = config["reference"],
             organism_name = config["organism"],
-            format = config["format_name"],
+            format = config["format"],
             not_use_merged = config["not_use_merged"],
             CADD_DB_SNVs = expand("{ref_dir}/annot/vep/CADD_scores_DB/whole_genome_SNVs.tsv.gz",ref_dir = reference_directory)[0],
             CADD_DB_indels = expand("{ref_dir}/annot/vep/CADD_scores_DB/gnomad.genomes.r3.0.indel.tsv.gz",ref_dir = reference_directory)[0],
@@ -34,7 +34,7 @@ rule variant_annotation:
 
 rule custom_annotation:
     input:  annotated = "annotate/all_variants.annotated.tsv",
-            format_file = workflow.basedir + "/resources/formats/" + config["format_name"] + ".txt",
+            format_file = workflow.basedir + "/resources/formats/" + config["format"] + ".txt",
     output: custom_annotated = "annotate/all_variants.annotated.processed.tsv"
     log:    "logs/custom_annotation.log"
     threads: 10
@@ -42,7 +42,8 @@ rule custom_annotation:
         mem_mb=8000
     params: resources_dir = workflow.basedir + "/resources",
             reference_name = config["reference"],
-            format = config["format_name"],
+            format = config["format"],
+            custom_DB_folder = expand("{ref_dir}/annot/custom",ref_dir = reference_directory)[0],
             anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])[0]
     conda:  "../wrappers/custom_annotation/env.yaml"
     script: "../wrappers/custom_annotation/script.py"

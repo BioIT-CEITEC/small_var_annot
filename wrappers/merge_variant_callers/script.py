@@ -36,18 +36,16 @@ for input_vcf in snakemake.input.vcfs:
         callers.append(input_vcf)
         merge_variant_callers_text = merge_variant_callers_text + "-I " + input_vcf + " "
 
-not_filtered_vcf_file = snakemake.output.not_filtered_vcf
-
 if len(callers) == 0:
-    command = "cp "+snakemake.input.vcfs[0]+" "+not_filtered_vcf_file
+    command = "cp "+snakemake.input.vcfs[0]+" "+snakemake.output.not_filtered_vcf
 elif len(callers) == 1:
-    command = "cp "+callers[0]+" "+not_filtered_vcf_file
+    command = "cp "+callers[0]+" "+snakemake.output.not_filtered_vcf
 else:
     command = "gatk MergeVcfs " + \
                merge_variant_callers_text +\
                " -R "+ snakemake.input.ref +\
                " -D " + snakemake.input.dict +\
-               " -O " + not_filtered_vcf_file +\
+               " -O " + snakemake.output.not_filtered_vcf +\
                " >> " + log_filename + " 2>&1 "
 
 
@@ -58,10 +56,16 @@ f.close()
 shell(command)
 
 # after_merge_processing
-command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_after_merge.R " + not_filtered_vcf_file + " " + snakemake.output.tsv + " germline"
+command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_after_merge.R "+\
+            snakemake.output.not_filtered_vcf + " " +\
+            snakemake.output.tsv + " " +\
+            str(snakemake.params.min_callers_threshold) + " " +\
+            str(snakemake.params.min_var_reads_threshold) +\
+            " >> " + log_filename + " 2>&1"
 
 f = open(log_filename, 'at')
 f.write("## COMMAND: "+command+"\n")
+f.write("## args <- c(\"" + "\",\"".join(command.split(" ")[2:-3]) + "\")\n")
 f.close()
 
 shell(command)

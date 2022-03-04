@@ -16,6 +16,7 @@ command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotat
             snakemake.params.reference_name + " " +\
             snakemake.params.anno_gtf + " " +\
             snakemake.params.resources_dir + " " +\
+            snakemake.params.custom_DB_folder + " " +\
             snakemake.input.format_file +\
             " >> " + log_filename + " 2>&1"
 
