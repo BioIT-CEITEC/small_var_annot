@@ -49,8 +49,8 @@ callers = config["callers"].split(';')
 
 
 # DEFAULT VALUES
-if not "format_name" in config:
-    config["format_name"] = "default"
+if not "format" in config:
+    config["format"] = "default"
 if not "min_variant_frequency" in config:
     config["min_variant_frequency"] = 0
 if not "not_use_merged" in config:

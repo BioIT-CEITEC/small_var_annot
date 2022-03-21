@@ -6,7 +6,7 @@
 rule process_and_format_annot_variants:
     input:  var_tabs = expand("merged/{sample_name}.processed.tsv", sample_name = sample_tab.sample_name),
             annotated = "annotate/all_variants.annotated.processed.tsv",
-            format_file = workflow.basedir + "/resources/formats/" + config["format_name"] + ".txt",
+            format_file = workflow.basedir + "/resources/formats/" + config["format"] + ".txt",
     output: all_vars_xlsx = "final_variant_table.xlsx",
             all_vars_tsv = "final_variant_table.tsv",
             per_sample_var_tabs = expand("per_sample_final_var_tabs/{sample_name}.variants.xlsx", sample_name = sample_tab.sample_name),
@@ -16,7 +16,7 @@ rule process_and_format_annot_variants:
         mem_mb=8000
     params: reference = config["reference"],
             min_variant_frequency = str(config["min_variant_frequency"]),
-            format = config["format_name"],
+            format = config["format"],
             anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])
     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
     script: "../wrappers/process_and_format_annot_variants/script.py"
@@ -30,7 +30,7 @@ rule process_and_format_annot_variants:
 #     threads: 10
 #     params: reference = config["reference"],
 #             min_variant_frequency = str(config["min_variant_frequency"]),
-#             format = config["format_name"],
+#             format = config["format"],
 #             anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])
 #     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
 #     script: "../wrappers/process_and_format_annot_variants/script.py"
@@ -43,7 +43,7 @@ rule process_and_format_annot_variants:
 #     threads: 10
 #     params: reference = config["reference"],
 #             min_variant_frequency = str(config["min_variant_frequency"]),
-#             format = config["format_name"],
+#             format = config["format"],
 #             anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])
 #     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
 #     script: "../wrappers/process_and_format_annot_variants/script.py"

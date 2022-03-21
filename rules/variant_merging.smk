@@ -9,6 +9,8 @@ rule merge_variant_callers:
             vcf= "merged/{sample_name}.processed.vcf",
             tsv = "merged/{sample_name}.processed.tsv"
     log:    "logs/{sample_name}/merge_variant_callers.log"
+    params: min_var_reads_threshold = 5,
+            min_callers_threshold = 1
     threads: 1
     conda:  "../wrappers/merge_variant_callers/env.yaml"
     script: "../wrappers/merge_variant_callers/script.py"
