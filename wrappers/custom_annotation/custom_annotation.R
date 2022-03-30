@@ -175,7 +175,7 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   }
   
   if(any(names(annot_tab) == "CLIN_SIG")){
-    load(paste0(resources_dir,"/clinvar_20180930.Rdata"))
+    load(paste0(custom_DB_folder,"/clinvar.Rdata"))
     annot_tab <- merge(annot_tab,clinvar_tab,by = "var_name",all.x = T)
     annot_tab[,CLIN_SIG := NULL]
   }

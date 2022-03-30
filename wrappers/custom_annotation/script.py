@@ -1,5 +1,5 @@
 #############################################################
-# wrapper for rule: process_and_format_annot_variants
+# wrapper for rule: custom_annotation
 #############################################################
 import os
 from snakemake.shell import shell
