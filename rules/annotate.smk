@@ -43,7 +43,7 @@ rule custom_annotation:
     params: resources_dir = workflow.basedir + "/resources",
             reference_name = config["reference"],
             format = config["format"],
-            custom_DB_folder = expand("{ref_dir}/annot/custom",ref_dir = reference_directory)[0],
+            custom_DB_folder = expand("{ref_dir}/annot/custom_new2",ref_dir = reference_directory)[0],
             anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])[0]
     conda:  "../wrappers/custom_annotation/env.yaml"
     script: "../wrappers/custom_annotation/script.py"
