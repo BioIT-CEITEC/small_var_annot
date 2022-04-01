@@ -2,7 +2,7 @@
   "workflow_description": {
     "name":"germline_small_var_call",
     "version": 1.0,
-    "label":"Germline small variant calling - cohort",
+    "label":"Germline small variant calling - test",
     "type":"germline_small_var_call",
     "inputs":[
       "mapped/{sample}.bam*"
