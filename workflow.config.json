@@ -16,7 +16,7 @@
       "annotate/*",
       "variant_calls/*"
     ],
-    inputs_optional:[
+    "inputs_optional":[
       "cohort_data/cohort_variants.tsv"
     ],
     "report_index": "annotate/all_variants.annotated.tsv_summary.html",
