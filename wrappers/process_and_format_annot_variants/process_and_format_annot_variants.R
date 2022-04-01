@@ -38,10 +38,12 @@ run_all <- function(args){
   per_sample_results_dir <- args[3]
   format_file <- args[4]
   VF_threshold <- as.numeric(args[5]) / 100
-  cohort_data <- args[6]
+  cohort_data_filename <- args[6]
   var_files <- args[7:length(args)]
 
-  
+
+  cohort_data <- fread(cohort_data_filename)
+
   #load format config file
   full_format_configs <- readLines(format_file)
   global_format_configs <- data.table(gsub("=.*","",full_format_configs[1:(which(full_format_configs == "") - 1)[1]]),
