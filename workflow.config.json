@@ -14,10 +14,10 @@
       "logs/*",
       "merged/*",
       "annotate/*",
-      "*.reports.zip",
-      "variant_calls/*",
-      "config.json",
-      ".taskrunner/*"
+      "variant_calls/*"
+    ],
+    inputs_optional:[
+      "cohort_data/cohort_variants.tsv"
     ],
     "report_index": "annotate/all_variants.annotated.tsv_summary.html",
     "reports":[
@@ -66,6 +66,16 @@
         "label": "Minimal number callers to call the variant.",
         "type": "int",
         "default": 1
+      },
+      "use_cohort_data": {
+        "label": "Load variants from previous experiments for annotations. need file: cohort_data/cohort_variants.tsv",
+        "type": "bool",
+        "default": false
+      },
+      "create_cohort_data": {
+        "label": "Create info about the variants from ",
+        "type": "bool",
+        "default": true
       }
     },
     "samples": {

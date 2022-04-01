@@ -38,7 +38,8 @@ run_all <- function(args){
   per_sample_results_dir <- args[3]
   format_file <- args[4]
   VF_threshold <- as.numeric(args[5]) / 100
-  var_files <- args[6:length(args)]
+  cohort_data <- args[6]
+  var_files <- args[7:length(args)]
 
   
   #load format config file
