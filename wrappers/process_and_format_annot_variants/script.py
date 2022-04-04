@@ -10,13 +10,25 @@ f = open(log_filename, 'wt')
 f.write("\n##\n## RULE: process_and_format_annot_variants \n##\n")
 f.close()
 
+if "cohort_data" in snakemake.input:
+    cohort_data_filename = snakemake.input.cohort_data
+else:
+    cohort_data_filename = "no_cohort_data"
+
+if snakemake.params.create_cohort_data:
+    create_cohort_data = "cohort_data/cohort_variants.tsv"
+else:
+    create_cohort_data = "dont_save_cohort_data"
+
 command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_format_annot_variants.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.all_vars_tsv + " " +\
             os.path.dirname(snakemake.output.per_sample_var_tabs[0]) + " " +\
             snakemake.input.format_file + " " +\
             snakemake.params.min_variant_frequency + " " +\
-            snakemake.input.cohort_data + " " +\
+            cohort_data_filename + " " +\
+            create_cohort_data + " " +\
+            snakemake.params.batch_name + " " +\
             " ".join(snakemake.input.var_tabs) +\
             " >> " + log_filename + " 2>&1"
 

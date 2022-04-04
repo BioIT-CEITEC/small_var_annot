@@ -39,10 +39,10 @@ run_all <- function(args){
   format_file <- args[4]
   VF_threshold <- as.numeric(args[5]) / 100
   cohort_data_filename <- args[6]
-  var_files <- args[7:length(args)]
+  create_cohort_data <- args[7]
+  batch_name <- args[8]
+  var_files <- args[9:length(args)]
 
-
-  cohort_data <- fread(cohort_data_filename)
 
   #load format config file
   full_format_configs <- readLines(format_file)
@@ -61,9 +61,13 @@ run_all <- function(args){
   all_var_tab <- filter_variants(all_var_tab,VF_threshold = VF_threshold)
   
   final_unformated_tab <- merge(all_var_tab,annot_tab,by = "var_name",allow.cartesian=TRUE)
+ 
+  if(any(col_config$orig_name == "occurance_in_cohort") == T | create_cohort_data != "dont_save_cohort_data"){
+    final_unformated_tab <- process_cohort_info(final_unformated_tab,cohort_data_filename,col_config,create_cohort_data,batch_name)
+  }
   
   #keep only cols in config which are in the final table
-  col_config <- col_config[orig_name %in% names(final_unformated_tab)]
+  col_config <- col_config[orig_name %in% names(final_unformated_tab) | orig_name == "null"]
 
   final_formated_tab <- format_final_var_table(final_unformated_tab,global_format_configs,col_config)
   
@@ -94,33 +98,36 @@ filter_variants <- function(all_var_tab,VF_threshold = 0,coverage_alarm = c(1,10
   return(all_var_tab)
 }
 
-
-compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs){
-  variant_tab <- unique(variant_tab,by = c("sample","var_name"))
-  mut_load_config <- as.data.table(tstrsplit(global_format_configs[V1 == "mut_load"]$V2,split = "::"))
+process_cohort_info <- function(final_unformated_tab,cohort_data_filename,col_config,create_cohort_data,batch_name){
+  cohort_data <- final_unformated_tab[,.(chrom,position = pos,reference,alternative,variant_frequency = variant_freq,coverage_depth,called_by = callers,sample,batch = batch_name)]
+  if(cohort_data_filename != "no_cohort_data"){
+    cohort_data <- rbind(fread(cohort_data_filename),cohort_data)
+    file.remove(cohort_data_filename)
+  } 
   
-  mut_load_res_tab <- data.table(sample = unique(variant_tab$sample))
-  for(index in seq_along(mut_load_config$V1)){
-    
-    filter_text <- trimws(mut_load_config[index,]$V3)
-    filtered_var_table <- eval(parse(text = paste0("variant_tab[",filter_text,"]")))
-    intervals <- fread(mut_load_config[index,]$V2)
-    intervals[,is_in := "x"]
-    
-    filtered_var_table <- annotate_with_intervals(filtered_var_table,intervals,annotate_cols_names = "is_in")
-    filtered_var_table <- filtered_var_table[!is.na(is_in)]
-    tab <- filtered_var_table[,list(mutation_load = round(.N * 10^6 / sum(intervals$end - intervals$start + 1),2)),by = sample]
-    mut_load_res_tab <- merge(mut_load_res_tab,tab,by = "sample",all.x = T)
-    mut_load_res_tab[is.na(mutation_load),mutation_load := 0]
-    setnames(mut_load_res_tab,"mutation_load",mut_load_config[index,]$V1)
-    
+  if(any(col_config$orig_name == "occurance_in_cohort") == T){
+    occurance_in_cohort_tab <- cohort_data[,.(chrom,position,reference,alternative,sample)]
+    occurance_in_cohort_tab[,occurance_in_cohort := length(unique(sample)),by = .(chrom,position,reference,alternative)]
+    occurance_in_cohort_tab[occurance_in_cohort < 5,in_samples := paste(unique(sample),collapse = ","),by = .(chrom,position,reference,alternative)]
+    occurance_in_cohort_tab[is.na(in_samples),in_samples := "multiple (5+)"]
+    occurance_in_cohort_tab <-  unique(occurance_in_cohort_tab,by = c("chrom","position","reference","alternative"))
+    occurance_in_cohort_tab <- occurance_in_cohort_tab[,.(chrom,pos = position,reference,alternative,occurance_in_cohort,in_samples)]
+    final_unformated_tab <- merge(final_unformated_tab,occurance_in_cohort_tab,by = c("chrom","pos","reference","alternative"))
   }
-  openxlsx::write.xlsx(mut_load_res_tab,file = mut_load_output_file)
+  
+  if(create_cohort_data != "dont_save_cohort_data"){
+    fwrite(cohort_data,create_cohort_data,sep = "\t")
+  }
+  
+  return(final_unformated_tab)
 }
 
-
-
 format_final_var_table  <- function(variant_tab,global_format_configs,col_config){
+  
+  if(any(col_config$orig_name == "null")){
+    variant_tab[,col_config[orig_name == "null"]$new_name := ""]
+    col_config[orig_name == "null",orig_name := new_name]
+  }
   
   #apply format specific rounding
   rounding <- as.numeric(global_format_configs[V1 == "rounding"]$V2)
@@ -224,8 +231,8 @@ empty_sample_names <<- character()
 
 # develop and test
 # setwd("/mnt/ssd/ssd_1/snakemake/stage359_PC.seq_A/somatic_variant_calling")
-# setwd("/mnt/ssd/ssd_1/sequia/211206__germline_small_var_call__1332")
-# args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","~/BioRoots/germline_small_var_call/resources/formats/default.txt","25","merged/BR-1052.processed.tsv","merged/BR-1053.processed.tsv","merged/BR-1054.processed.tsv","merged/BR-1055.processed.tsv","merged/BR-1056.processed.tsv","merged/BR-1060.processed.tsv","merged/BR-1061.processed.tsv","merged/BR-1062.processed.tsv","merged/BR-1063.processed.tsv","merged/BR-1064.processed.tsv","merged/BR-1065.processed.tsv","merged/BR-1066.processed.tsv","merged/H-0381.processed.tsv","merged/H-0388.processed.tsv","merged/H-0389.processed.tsv","merged/H-0397.processed.tsv")
+# setwd("/mnt/ssd/ssd_1/sequia/220404__germline_small_var_call__3347")
+# args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","per_sample_final_var_tabs","/mnt/ssd/ssd_1/sequia/220404__germline_small_var_call__3347/resources/formats/BRONCO.txt","25","cohort_data/cohort_variants.tsv","cohort_data/cohort_variants.tsv","60_test","merged/H-0430.processed.tsv","merged/H-0431.processed.tsv","merged/H-0314.processed.tsv")
 
 #run as Rscript
 args <- commandArgs(trailingOnly = T)

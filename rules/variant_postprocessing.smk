@@ -11,7 +11,7 @@ def cohort_data_input(wildcards):
 rule process_and_format_annot_variants:
     input:  var_tabs = expand("merged/{sample_name}.processed.tsv", sample_name = sample_tab.sample_name),
             annotated = "annotate/all_variants.annotated.processed.tsv",
-            format_file = workflow.basedir + "/resources/formats/" + config["format"] + ".txt",
+            format_file = workflow.source_path("resources/formats/" + config["format"] + ".txt"),
             cohort_data = cohort_data_input
     output: all_vars_xlsx = "final_variant_table.xlsx",
             all_vars_tsv = "final_variant_table.tsv",
@@ -23,7 +23,9 @@ rule process_and_format_annot_variants:
     params: reference = config["reference"],
             min_variant_frequency = str(config["min_variant_frequency"]),
             format = config["format"],
-            anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])
+            anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"]),
+            create_cohort_data = config["create_cohort_data"],
+            batch_name = config["entity_name"]
     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
     script: "../wrappers/process_and_format_annot_variants/script.py"
 
