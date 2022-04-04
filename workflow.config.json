@@ -47,11 +47,7 @@
         "label": "Result variant table format ",
         "type": "enum",
         "default": "default",
-        "list": {
-          "default": "Default germline format",
-          "BRONCO": "BRONCO",
-          "slaby_children_germ" : "Pediatric oncology project format"
-        }
+        "list": ##INCLUDE:general/germline_small_var_call_fromat_files/format_info.json##
       }
     },
     "detailed": {

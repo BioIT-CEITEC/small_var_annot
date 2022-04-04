@@ -6,8 +6,7 @@ from snakemake.utils import min_version
 configfile: "config.json"
 
 min_version("5.18.0")
-
-GLOBAL_REF_PATH = "/mnt/references/"
+GLOBAL_REF_PATH = config["globalResources"]
 
 # Reference processing
 #
