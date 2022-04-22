@@ -44,10 +44,10 @@
         "default": "strelka;vardict;haplotypecaller"
       },
       "format": {
-        "label": "Result variant table format ",
+        "label": "Result variant table format",
         "type": "enum",
         "default": "default",
-        "list": ##INCLUDE:general/germline_small_var_call_fromat_files/format_info.json##
+        "list": ##INCLUDE:general/germline_small_var_call_format_files/format_info.json##
       }
     },
     "detailed": {
