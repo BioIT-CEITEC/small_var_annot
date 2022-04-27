@@ -52,17 +52,17 @@
     },
     "detailed": {
       "min_variant_frequency": {
-        "label": "Minimal variant frequency to report in percent",
+        "label": "Minimal variant frequency to report in percent.",
         "type": "int",
         "default": 25
       },
       "min_var_reads_threshold": {
-        "label": "Minimal number of variant reads to report variant.",
+        "label": "Minimal number of variant supporting reads to report variant.",
         "type": "int",
         "default": 5
       },
       "min_callers_threshold": {
-        "label": "Minimal number callers to call the variant.",
+        "label": "Minimal number callers to call the variant to report it.",
         "type": "int",
         "default": 1
       },
@@ -72,25 +72,9 @@
         "default": false
       },
       "create_cohort_data": {
-        "label": "Create info about the variants from ",
+        "label": "Create info about the variants from current and previous samples. create file: cohort_data/cohort_variants.tsv",
         "type": "bool",
         "default": true
-      }
-    },
-    "samples": {
-      "donor": {
-        "label": "Patient ID",
-        "type": "string",
-        "default": ""
-      },
-      "tumor_normal": {
-        "label": "Tumor/normal",
-        "type": "enum",
-        "default": "normal",
-        "list": {
-          "tumor": "tumor",
-          "normal": "normal"
-        }
       }
     }
   }
