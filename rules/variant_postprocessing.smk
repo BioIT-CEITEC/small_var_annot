@@ -11,7 +11,7 @@ def cohort_data_input(wildcards):
 rule process_and_format_annot_variants:
     input:  var_tabs = expand("merged/{sample_name}.processed.tsv", sample_name = sample_tab.sample_name),
             annotated = "annotate/all_variants.annotated.processed.tsv",
-            format_file = GLOBAL_REF_PATH + "/general/germline_small_var_call_fromat_files/" + config["format"] + ".txt",
+            format_file = GLOBAL_REF_PATH + "/general/germline_small_var_call_format_files/" + config["format"] + ".txt",
             cohort_data = cohort_data_input
     output: all_vars_xlsx = "final_variant_table.xlsx",
             all_vars_tsv = "final_variant_table.tsv",
