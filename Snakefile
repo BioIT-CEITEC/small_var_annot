@@ -10,7 +10,6 @@ GLOBAL_REF_PATH = config["globalResources"]
 
 # Reference processing
 #
-config["material"] = "DNA"
 if config["lib_ROI"] != "wgs" or config["lib_ROI"] != "RNA":
     # setting reference from lib_ROI
     f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
@@ -18,9 +17,7 @@ if config["lib_ROI"] != "wgs" or config["lib_ROI"] != "RNA":
     f.close()
     config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
 else:
-    if config["lib_ROI"] != "RNA":
-        config["material"] = "RNA"
-        config["lib_ROI"] = "wgs"
+    config["lib_ROI"] = "wgs"
 
 # setting organism from reference
 f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference.json"),)
@@ -33,9 +30,17 @@ config["organism"] = [organism_name.lower().replace(" ","_") for organism_name i
 #
 reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["reference"])
 
+
 # Samples
 #
 sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
+
+if "tumor_normal" in sample_tab:
+    sample_tab.drop(sample_tab[sample_tab.tumor_normal == "normal"].index)
+
+if "donor" in sample_tab:
+    sample_tab["sample_name"] = sample_tab["donor"]
+
 
 # if not config["is_paired"]:
 #     read_pair_tags = [""]
@@ -52,8 +57,6 @@ callers = config["callers"].split(';')
 # DEFAULT VALUES
 if not "format" in config:
     config["format"] = "default"
-if not "min_variant_frequency" in config:
-    config["min_variant_frequency"] = 0
 if not "not_use_merged" in config:
     config["not_use_merged"] = False
 
@@ -68,8 +71,6 @@ wildcard_constraints:
 
 ####################################
 # SEPARATE RULES
-include: "rules/callers.smk"
-include: "rules/variant_merging.smk"
 include: "rules/annotate.smk"
 include: "rules/variant_postprocessing.smk"
 

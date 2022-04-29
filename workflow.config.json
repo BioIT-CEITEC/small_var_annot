@@ -5,7 +5,7 @@
     "label":"Germline small variant calling",
     "type":"germline_small_var_call",
     "inputs":[
-      "mapped/{sample}.bam*"
+      "merged/{sample_name}.processed.tsv"
     ],
     "outputs":[
       "final_variant_table.xlsx",
@@ -20,7 +20,8 @@
       "cohort_data/cohort_variants.tsv"
     ],
     "outputs_optional":[
-      "cohort_data/cohort_variants.tsv"
+      "cohort_data/cohort_variants.tsv",
+      "mutation_loads.xlsx"
     ],
     "report_index": "annotate/all_variants.annotated.tsv_summary.html",
     "reports":[
@@ -32,17 +33,11 @@
     "sample_name"
   ],
   "requested_params": [
-    "is_paired",
     "reference",
     "lib_ROI"
   ],
   "gui_params" : {
     "primary": {
-      "callers": {
-        "label": "Variant callers to use",
-        "type": "string",
-        "default": "strelka;vardict;haplotypecaller"
-      },
       "format": {
         "label": "Result variant table format",
         "type": "enum",
@@ -51,21 +46,6 @@
       }
     },
     "detailed": {
-      "min_variant_frequency": {
-        "label": "Minimal variant frequency to report in percent.",
-        "type": "int",
-        "default": 25
-      },
-      "min_var_reads_threshold": {
-        "label": "Minimal number of variant supporting reads to report variant.",
-        "type": "int",
-        "default": 5
-      },
-      "min_callers_threshold": {
-        "label": "Minimal number callers to call the variant to report it.",
-        "type": "int",
-        "default": 1
-      },
       "use_cohort_data": {
         "label": "Load variants from previous experiments for annotations. need file: cohort_data/cohort_variants.tsv",
         "type": "bool",
