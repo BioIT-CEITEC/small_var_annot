@@ -88,13 +88,23 @@ run_all <- function(args){
 }
 
 filter_variants <- function(all_var_tab,VF_threshold = 0,coverage_alarm = c(1,10,40),single_transcript = T){
-  
-  all_var_tab <- all_var_tab[variant_freq > VF_threshold,]
-  all_var_tab[,alarm := ""]
-  all_var_tab[coverage_depth < coverage_alarm[3],alarm := "Low coverage"]
-  all_var_tab[coverage_depth < coverage_alarm[2],alarm := "Very low coverage"]
-  all_var_tab[coverage_depth < coverage_alarm[1],alarm := "No coverage"]
-  
+  if(any("variant_freq" == names(all_var_tab))){
+    all_var_tab <- all_var_tab[variant_freq > VF_threshold,]
+  }
+
+  if(any("coverage_depth" == names(all_var_tab))){
+    all_var_tab[,alarm := ""]
+    all_var_tab[coverage_depth < coverage_alarm[3],alarm := "Low coverage"]
+    all_var_tab[coverage_depth < coverage_alarm[2],alarm := "Very low coverage"]
+    all_var_tab[coverage_depth < coverage_alarm[1],alarm := "No coverage"]
+  } else {
+    if(any("tumor_depth" == names(all_var_tab))){
+      all_var_tab[,alarm := ""]
+      all_var_tab[tumor_depth < coverage_alarm[3],alarm := "Low coverage"]
+      all_var_tab[tumor_depth < coverage_alarm[2],alarm := "Very low coverage"]
+      all_var_tab[tumor_depth < coverage_alarm[1],alarm := "No coverage"]
+    }
+  }
   return(all_var_tab)
 }
 

@@ -3,7 +3,7 @@
 # MERGE VARIANTS
 #
 rule merge_variants_in_samples:
-    input:  var_tabs = expand("merged/{sample_name}.processed.tsv", sample_name = sample_tab.sample_name),
+    input:  var_tabs = expand("merged/{sample_name}.variants.tsv", sample_name = sample_tab.sample_name),
     output: tsv_for_vep = "annotate/all_variants.tsv"
     log:    "logs/merge_variants_in_samples.log"
     threads: 20
