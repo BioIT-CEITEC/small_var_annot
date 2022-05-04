@@ -2,17 +2,11 @@
 # ####################################
 # # AFTER ANNOTATION PROCESSING
 # #
-def cohort_data_input(wildcards):
-    if config["use_cohort_data"] == True:
-        return "cohort_data/cohort_variants.tsv"
-    else:
-        return None
-
 rule process_and_format_annot_variants:
     input:  var_tabs = expand("merged/{sample_name}.variants.tsv", sample_name = sample_tab.sample_name),
             annotated = "annotate/all_variants.annotated.processed.tsv",
             format_file = GLOBAL_REF_PATH + "/general/germline_small_var_call_format_files/" + config["format"] + ".txt",
-            cohort_data = cohort_data_input
+            cohort_data = expand("cohort_data/cohort_variants.tsv", proxy=[] if config["use_cohort_data"] == True else [None])
     output: all_vars_xlsx = "final_variant_table.xlsx",
             all_vars_tsv = "final_variant_table.tsv",
             per_sample_var_tabs = expand("per_sample_final_var_tabs/{sample_name}.variants.xlsx", sample_name = sample_tab.sample_name),

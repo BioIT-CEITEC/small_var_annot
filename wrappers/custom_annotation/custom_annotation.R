@@ -75,7 +75,7 @@ add_custom_DB <- function(tab,custom_DBs,custom_DB_folder){
     DB_name <- DB_name_split[1]
     DB_filename <- list.files(custom_DB_folder,pattern = DB_name,full.names = T)
     if(length(DB_filename) == 1){
-      orig_DB <- fread(DB_filename)
+      orig_DB <- fread(DB_filename,sep = "\t",quote="")
       DB <- orig_DB[, c(T,lapply(orig_DB[,-1,with = FALSE], is.numeric) == TRUE), with = FALSE]
       orig_DB <- unique(orig_DB,by = names(DB)[1:3])
       setorder(orig_DB)
