@@ -56,7 +56,7 @@ run_all <- function(args){
   annot_tab <- fread(annot_file)
   
   #load and filter vars from all samples
-  sample_filename_pattern <- paste0(".*\\/(.*).processed.tsv")
+  sample_filename_pattern <- paste0(".*\\/(.*).variants.tsv")
   all_var_tab <- fread_vector_of_files(var_files,regex = sample_filename_pattern)
   all_var_tab <- filter_variants(all_var_tab,VF_threshold = VF_threshold)
   
@@ -109,7 +109,28 @@ filter_variants <- function(all_var_tab,VF_threshold = 0,coverage_alarm = c(1,10
 }
 
 process_cohort_info <- function(final_unformated_tab,cohort_data_filename,col_config,create_cohort_data,batch_name){
-  cohort_data <- final_unformated_tab[,.(chrom,position = pos,reference,alternative,variant_frequency = variant_freq,coverage_depth,called_by = callers,sample,batch = batch_name)]
+  cohort_data <- final_unformated_tab[,.(chrom,position = pos,reference,alternative,sample,batch = batch_name)]
+  if(any(names(final_unformated_tab) == "variant_freq")){
+    cohort_data[,variant_frequency := final_unformated_tab$variant_freq]
+  } else if(any(names(final_unformated_tab) == "tumor_variant_freq")){
+    cohort_data[,variant_frequency := final_unformated_tab$tumor_variant_freq]
+  } else {
+    cohort_data[,variant_frequency := NA_real_]
+  }
+  if(any(names(final_unformated_tab) == "coverage_depth")){
+    cohort_data[,coverage_depth := final_unformated_tab$coverage_depth]
+  } else if(any(names(final_unformated_tab) == "tumor_depth")){
+    cohort_data[,coverage_depth := final_unformated_tab$tumor_depth]
+  } else {
+    cohort_data[,coverage_depth := NA_integer_]
+  }
+  if(any(names(final_unformated_tab) == "callers")){
+    cohort_data[,called_by := final_unformated_tab$callers]
+  } else {
+    cohort_data[,called_by := NA_character_]
+  }
+  setcolorder(cohort_data,c("chrom","position","reference","alternative","variant_frequency","coverage_depth","called_by","sample","batch"))
+
   if(cohort_data_filename != "no_cohort_data"){
     cohort_data <- rbind(fread(cohort_data_filename),cohort_data)
     file.remove(cohort_data_filename)
