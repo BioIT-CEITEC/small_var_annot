@@ -8,7 +8,8 @@ run_all <- function(args){
   tab_to_print <- rbindlist(lapply(input_files,fread))
   
   ###### extract chrom,position,reference,alternative from varname
-  
+
+
   
   tab_to_print[,"chromosome"]<-sapply(strsplit(as.character(tab_to_print$var_name), "_"), "[[", 1)
   tab_to_print[,"start"]<-sapply(strsplit(as.character(tab_to_print$var_name), "_"), "[[", 2)
@@ -19,24 +20,12 @@ run_all <- function(args){
   tab_to_print[,start := as.integer(start)]
   tab_to_print[,end := as.integer(start) + nchar(reference) - 1L]
   tab_to_print[,strand := "+"]
-  
-  
+
   # VEP > WARNING: Alleles look like an insertion (-/T) but coordinates are not start = end + 1, PROTO:
   tab_to_print[,reference := gsub("/.*","",allele)]
   tab_to_print[reference == "-",end := start - 1L]
   
-  tab_to_print <- tab_to_print[,.(chromosome,start,end,allele,strand)]  
-  
-  
-  
-  ##############################################################################
-  # tab_to_print <- tab_to_print[,.(chromosome,start,reference,allele)]
-  # tab_to_print <- unique(tab_to_print)
-  # tab_to_print[,start := position]
-  # tab_to_print[,end := start + nchar(reference) - 1L]
-  # tab_to_print[reference == "-",end := end - 1L]
-  # tab_to_print[,strand := "+"]
-  # tab_to_print <- tab_to_print[,.(chromosome,start,end,allele,strand)]
+  tab_to_print <- tab_to_print[,.(chromosome,start,end,allele,strand)]
 
   setkey(tab_to_print)
   

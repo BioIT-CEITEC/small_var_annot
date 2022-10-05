@@ -1,20 +1,18 @@
 {
   "workflow_description": {
-    "name":"germline_small_var_call",
+    "name":"small_var_annot",
     "version": 1.0,
-    "label":"Germline small variant calling",
-    "type":"germline_small_var_call",
+    "label":"Small variant annotation",
+    "type":"var_call",
     "inputs":[
-      "merged/{sample_name}.processed.tsv"
+      "merged/{sample}.variants.tsv"
     ],
     "outputs":[
       "final_variant_table.xlsx",
       "final_variant_table.tsv",
       "per_sample_final_var_tabs/*",
       "logs/*",
-      "merged/*",
-      "annotate/*",
-      "variant_calls/*"
+      "annotate/*"
     ],
     "inputs_optional":[
       "cohort_data/cohort_variants.tsv"
@@ -38,11 +36,44 @@
   ],
   "gui_params" : {
     "primary": {
-      "format": {
+      "calling_type": {
+        "label": "Somatic or germline variants",
+        "type": "enum",
+        "default": "germline",
+        "list": {
+          "germline": "Germline",
+          "somatic": "Somatic"
+        }
+      },
+      "germline_format": {
         "label": "Result variant table format",
         "type": "enum",
         "default": "default",
-        "list": ##INCLUDE:general/germline_small_var_call_format_files/format_info.json##
+        "list": ##INCLUDE:general/germline_small_var_call_format_files/format_info.json##,
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "calling_type": "germline"
+            }
+          }
+        }
+      },
+      "somatic_format": {
+        "label": "Result variant table format",
+        "type": "enum",
+        "default": "default",
+        "list": ##INCLUDE:general/somatic_small_var_call_format_files/format_info.json##,
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "calling_type": "somatic"
+            }
+          }
+        }
       }
     },
     "detailed": {

@@ -10,7 +10,7 @@ GLOBAL_REF_PATH = config["globalResources"]
 
 # Reference processing
 #
-if config["lib_ROI"] != "wgs" or config["lib_ROI"] != "RNA":
+if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "RNA":
     # setting reference from lib_ROI
     f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
     lib_ROI_dict = json.load(f)
@@ -45,6 +45,11 @@ if "tumor_normal" in sample_tab:
 if "donor" in sample_tab:
     sample_tab["sample_name"] = sample_tab["donor"]
 
+if config["calling_type"] == "germline":
+    config["format"] = config["germline_format"]
+else:
+    config["format"] = config["somatic_format"]
+
 
 # if not config["is_paired"]:
 #     read_pair_tags = [""]
@@ -55,7 +60,7 @@ if "donor" in sample_tab:
 
 
 
-callers = config["callers"].split(';')
+# callers = config["callers"].split(';')
 
 
 # DEFAULT VALUES
@@ -63,6 +68,8 @@ if not "format" in config:
     config["format"] = "default"
 if not "not_use_merged" in config:
     config["not_use_merged"] = False
+if not "min_variant_frequency" in config:
+    config["min_variant_frequency"] = 0
 
 wildcard_constraints:
     vartype = "snvs|indels",
