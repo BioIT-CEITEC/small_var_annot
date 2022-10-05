@@ -56,23 +56,35 @@ if sum(1 for line in open(snakemake.input.tsv_for_vep)) > 1:
                          cache_version = num
 
 
-        command = "vep --dir " + snakemake.params.vep_dir +\
-                       " --everything "  + merged +\
-                       " --fasta "+ snakemake.params.ref +\
-                       " --offline --assembly " + assembly +\
-                       " --cache_version " + str(cache_version) +\
-                       " --input_file " + snakemake.input.tsv_for_vep +\
-                       " --output_file " + snakemake.output.annotated +\
-                       " --force_overwrite " + \
-                       " --dir_plugins " + snakemake.params.dir_plugins + \
-                       " --plugin CADD," + snakemake.params.CADD_DB_SNVs + ","  + snakemake.params.CADD_DB_indels + " " +\
-                       fork_text + " >> " + log_filename + " 2>&1"
+        if organism == "homo_sapiens":
+            command = "vep --dir " + snakemake.params.vep_dir +\
+                           " --everything "  + merged +\
+                           " --fasta "+ snakemake.params.ref +\
+                           " --offline --assembly " + assembly +\
+                           " --cache_version " + str(cache_version) +\
+                           " --input_file " + snakemake.input.tsv_for_vep +\
+                           " --output_file " + snakemake.output.annotated +\
+                           " --force_overwrite " + \
+                           " --dir_plugins " + snakemake.params.dir_plugins + \
+                           " --plugin CADD," + snakemake.params.CADD_DB_SNVs + ","  + snakemake.params.CADD_DB_indels + " " +\
+                           fork_text + " >> " + log_filename + " 2>&1"
+        else:
+            command = "vep --dir " + snakemake.params.vep_dir + \
+                      " --everything " + merged + \
+                      " --fasta " + snakemake.params.ref + \
+                      " --species " + organism + \
+                      " --offline --assembly " + assembly + \
+                      " --cache_version " + str(cache_version) + \
+                      " --input_file " + snakemake.input.tsv_for_vep + \
+                      " --output_file " + snakemake.output.annotated + \
+                      " --force_overwrite " + \
+                      fork_text + " >> " + log_filename + " 2>&1"
 
+            f = open(log_filename, 'at')
+            f.write("## COMMAND: "+command+"\n")
+            f.close()
+            shell(command)
 
-        f = open(log_filename, 'at')
-        f.write("## COMMAND: "+command+"\n")
-        f.close()
-        shell(command)
 
     else:
         annot_dir = snakemake.params.vep_dir.replace("/vep","")

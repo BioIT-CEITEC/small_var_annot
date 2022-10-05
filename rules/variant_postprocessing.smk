@@ -25,7 +25,10 @@ rule process_and_format_annot_variants:
             format = config["format"],
             anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"]),
             create_cohort_data = config["create_cohort_data"],
-            batch_name = config["entity_name"]
+            batch_name = config["entity_name"],
+            ref_dir= reference_directory,
+            organism=config["organism"]
+
     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
     script: "../wrappers/process_and_format_annot_variants/script.py"
 

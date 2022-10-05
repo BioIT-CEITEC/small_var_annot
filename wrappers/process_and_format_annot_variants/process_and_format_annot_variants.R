@@ -41,7 +41,9 @@ run_all <- function(args){
   cohort_data_filename <- args[6]
   create_cohort_data <- args[7]
   batch_name <- args[8]
-  var_files <- args[9:length(args)]
+  reference_directory <- args[9]
+  organism <- args[10]
+  var_files <- args[11:length(args)]
 
 
   #load format config file
@@ -61,7 +63,16 @@ run_all <- function(args){
   all_var_tab <- filter_variants(all_var_tab,VF_threshold = VF_threshold)
   
   final_unformated_tab <- merge(all_var_tab,annot_tab,by = "var_name",allow.cartesian=TRUE)
- 
+
+  # TMB for Human only
+  if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO") && organism == "homo_sapiens"){
+    compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs,reference_directory)
+  } else {
+    system(paste0("touch ",mut_load_output_file))
+  }
+
+
+  # COHORT
   if(any(col_config$orig_name == "occurance_in_cohort") == T | create_cohort_data != "dont_save_cohort_data"){
     final_unformated_tab <- process_cohort_info(final_unformated_tab,cohort_data_filename,col_config,create_cohort_data,batch_name)
   }
@@ -255,6 +266,33 @@ write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_f
     }
   }
 
+}
+
+compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs,reference){
+  variant_tab <- unique(variant_tab,by = c("sample","var_name"))
+  mut_load_config <- as.data.table(tstrsplit(global_format_configs[V1 == "mut_load"]$V2,split = "::"))
+
+  mut_load_res_tab <- data.table(sample = unique(variant_tab$sample))
+  for(index in seq_along(mut_load_config$V1)){
+
+    filter_text <- trimws(mut_load_config[index,]$V3)
+    filtered_var_table <- eval(parse(text = paste0("variant_tab[",filter_text,"]")))
+
+    # add reference path /mnt/references/homsap/GRCh37-p13
+    mut_definitions <- paste0("/mnt/references/homsap/",reference,"/")
+    intervals <- fread(paste0(mut_definitions,mut_load_config[index,]$V2))
+
+    intervals[,is_in := "x"]
+
+    filtered_var_table <- annotate_with_intervals(filtered_var_table,intervals,annotate_cols_names = "is_in")
+    filtered_var_table <- filtered_var_table[!is.na(is_in)]
+    tab <- filtered_var_table[,list(mutation_load = round(.N * 10^6 / sum(intervals$end - intervals$start + 1),2)),by = sample]
+    mut_load_res_tab <- merge(mut_load_res_tab,tab,by = "sample",all.x = T)
+    mut_load_res_tab[is.na(mutation_load),mutation_load := 0]
+    setnames(mut_load_res_tab,"mutation_load",mut_load_config[index,]$V1)
+
+  }
+  openxlsx::write.xlsx(mut_load_res_tab,file = mut_load_output_file)
 }
 
 

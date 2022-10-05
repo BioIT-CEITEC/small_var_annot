@@ -4,12 +4,12 @@ import json
 from snakemake.utils import min_version
 
 configfile: "config.json"
-
 min_version("5.18.0")
 GLOBAL_REF_PATH = config["globalResources"]
 
 # Reference processing
 #
+config["material"] = "DNA"
 if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "RNA":
     # setting reference from lib_ROI
     f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
@@ -18,8 +18,10 @@ if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "RNA":
     config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
 else:
     config["lib_ROI"] = "wgs"
+    if config["lib_ROI"] == "RNA":
+        config["material"] = "RNA"
 
-# setting organism from reference
+#### Setting organism from reference
 f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference2.json"),)
 reference_dict = json.load(f)
 f.close()
@@ -29,11 +31,11 @@ if len(config["species_name"].split(" (")) > 1:
     config["species"] = config["species_name"].split(" (")[1].replace(")","")
 
 
+
 ##### Config processing #####
 # Folders
 #
 reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["reference"])
-
 
 # Samples
 #
@@ -57,8 +59,6 @@ else:
 # else:
 #     read_pair_tags = ["_R1","_R2"]
 #     paired = "PE"
-
-
 
 # callers = config["callers"].split(';')
 

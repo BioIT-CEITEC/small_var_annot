@@ -30,6 +30,8 @@ command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_fo
             cohort_data_filename + " " +\
             create_cohort_data + " " +\
             snakemake.params.batch_name + " " +\
+            snakemake.params.ref_dir + " " +\
+            snakemake.params.organism + " " +\
             " ".join(snakemake.input.var_tabs) +\
             " >> " + log_filename + " 2>&1"
 
