@@ -38,7 +38,21 @@ if len(config["species_name"].split(" (")) > 1:
 reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["reference"])
 
 # Samples
-#
+########################################################################################################################
+##### Config processing #####
+#conversion from new json
+if config["tumor_normal_paired"]:
+    sample_tab_initial = pd.DataFrame.from_dict(config["samples"],orient="index")
+    sample_tab = pd.DataFrame({"sample_name" : [],"sample_name_normal" : [],"sample_name_tumor" : []})
+    sample_tab["sample_name"]=sample_tab_initial["donor"].unique()
+    for index, row in sample_tab.iterrows():
+        sample_tab.loc[index,"sample_name_normal"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="normal"),"sample_name"].to_string(index=False)
+        sample_tab.loc[index,"sample_name_tumor"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="tumor"),"sample_name"].to_string(index=False)
+else:
+    sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
+
+
+## OR PREVIOUS
 sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
 
 if "tumor_normal" in sample_tab:
@@ -52,16 +66,10 @@ if config["calling_type"] == "germline":
 else:
     config["format"] = config["somatic_format"]
 
+########################################################################################################################
 
-# if not config["is_paired"]:
-#     read_pair_tags = [""]
-#     paired = "SE"
-# else:
-#     read_pair_tags = ["_R1","_R2"]
-#     paired = "PE"
-
-# callers = config["callers"].split(';')
-
+#### SPLIT CALLERS STRING
+callers = config["callers"].split(';')
 
 # DEFAULT VALUES
 if not "format" in config:
@@ -76,8 +84,6 @@ wildcard_constraints:
     sample = "|".join(sample_tab.sample_name),
     lib_name = "[^\.\/]+",
     read_pair_tag = "(_R.)?"
-
-
 
 
 ####################################
