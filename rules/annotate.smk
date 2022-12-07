@@ -1,9 +1,9 @@
 
 ####################################
-# MERGE VARIANTS
+# Merge variants from all samples for faster annotation
 #
 rule merge_variants_in_samples:
-    input:  var_tabs = expand("merged/{sample_name}.variants.tsv", sample_name = sample_tab.sample_name),
+    input:  var_tabs = expand("{calling_type}_varcalls/{sample_name}.final_variants.tsv", sample_name = sample_tab.sample_name, calling_type = config["calling_type"]),
     output: tsv_for_vep = "annotate/all_variants.tsv"
     log:    "logs/merge_variants_in_samples.log"
     threads: 20
@@ -12,7 +12,7 @@ rule merge_variants_in_samples:
     conda:  "../wrappers/merge_variants_in_samples/env.yaml"
     script: "../wrappers/merge_variants_in_samples/script.py"
 
-## ANNOTATION of VARIANTS in SAMPLES
+## ANNOTATION of VARIANTS in all SAMPLES
 rule variant_annotation:
     input:  tsv_for_vep = "annotate/all_variants.tsv"
     output: annotated = "annotate/all_variants.annotated.tsv"

@@ -5,7 +5,7 @@
     "label":"Small variant annotation",
     "type":"var_call",
     "inputs":[
-      "merged/*.variants.tsv"
+      "*_varcalls/*.final_variants.tsv"
     ],
     "outputs":[
       "final_variant_table.xlsx",

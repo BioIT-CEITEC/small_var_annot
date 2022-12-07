@@ -9,17 +9,13 @@ GLOBAL_REF_PATH = config["globalResources"]
 
 # Reference processing
 #
-config["material"] = "DNA"
+
 if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "RNA":
     # setting reference from lib_ROI
     f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
     lib_ROI_dict = json.load(f)
     f.close()
     config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
-else:
-    config["lib_ROI"] = "wgs"
-    if config["lib_ROI"] == "RNA":
-        config["material"] = "RNA"
 
 #### Setting organism from reference
 f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference2.json"),)
@@ -41,35 +37,22 @@ reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["re
 ########################################################################################################################
 ##### Config processing #####
 #conversion from new json
-if config["tumor_normal_paired"]:
-    sample_tab_initial = pd.DataFrame.from_dict(config["samples"],orient="index")
-    sample_tab = pd.DataFrame({"sample_name" : [],"sample_name_normal" : [],"sample_name_tumor" : []})
-    sample_tab["sample_name"]=sample_tab_initial["donor"].unique()
-    for index, row in sample_tab.iterrows():
-        sample_tab.loc[index,"sample_name_normal"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="normal"),"sample_name"].to_string(index=False)
-        sample_tab.loc[index,"sample_name_tumor"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="tumor"),"sample_name"].to_string(index=False)
+if config["calling_type"] == "somatic":
+    config["format"] = config["somatic_format"]
+    if config["tumor_normal_paired"]:
+        sample_tab_initial = pd.DataFrame.from_dict(config["samples"],orient="index")
+        sample_tab = pd.DataFrame({"sample_name" : [],"sample_name_normal" : [],"sample_name_tumor" : []})
+        sample_tab["sample_name"]=sample_tab_initial["donor"].unique()
+        for index, row in sample_tab.iterrows():
+            sample_tab.loc[index,"sample_name_normal"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="normal"),"sample_name"].to_string(index=False)
+            sample_tab.loc[index,"sample_name_tumor"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="tumor"),"sample_name"].to_string(index=False)
+    else:
+        sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
 else:
     sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
-
-
-## OR PREVIOUS
-sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
-
-if "tumor_normal" in sample_tab:
-    sample_tab.drop(sample_tab[sample_tab.tumor_normal == "normal"].index)
-
-if "donor" in sample_tab:
-    sample_tab["sample_name"] = sample_tab["donor"]
-
-if config["calling_type"] == "germline":
     config["format"] = config["germline_format"]
-else:
-    config["format"] = config["somatic_format"]
 
-########################################################################################################################
-
-#### SPLIT CALLERS STRING
-callers = config["callers"].split(';')
+#######################################################################################################################
 
 # DEFAULT VALUES
 if not "format" in config:
