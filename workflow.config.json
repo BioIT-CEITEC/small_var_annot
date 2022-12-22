@@ -32,9 +32,7 @@
   ],
   "requested_params": [
     "reference",
-    "lib_ROI",
-    "tumor_normal_paired",
-    "donor"
+    "lib_ROI"
   ],
   "gui_params" : {
     "primary": {
@@ -51,7 +49,12 @@
         "label": "Result variant table format",
         "type": "enum",
         "default": "default",
-        "list": ##INCLUDE:general/germline_small_var_call_format_files/format_info.json##,
+        "list":
+        #
+        #
+        INCLUDE: general/germline_small_var_call_format_files/format_info.json
+        #
+        #,
         "conditions": {
           "relevance": {
             "operand": "equal",
@@ -66,7 +69,12 @@
         "label": "Result variant table format",
         "type": "enum",
         "default": "default",
-        "list": ##INCLUDE:general/somatic_small_var_call_format_files/format_info.json##,
+        "list":
+        #
+        #
+        INCLUDE: general/somatic_small_var_call_format_files/format_info.json
+        #
+        #,
         "conditions": {
           "relevance": {
             "operand": "equal",
@@ -76,6 +84,11 @@
             }
           }
         }
+      },
+      "tumor_normal_paired": {
+        "label": "Samples are tumor-normal paired",
+        "type": "bool",
+        "default": true
       }
     },
     "detailed": {
@@ -88,6 +101,22 @@
         "label": "Create info about the variants from current and previous samples. create file: cohort_data/cohort_variants.tsv",
         "type": "bool",
         "default": true
+      }
+    },
+    "samples": {
+      "donor": {
+        "label": "Patient ID",
+        "type": "string",
+        "default": "",
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
+            }
+          }
+        }
       }
     }
   }
