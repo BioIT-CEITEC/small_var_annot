@@ -32,7 +32,9 @@
   ],
   "requested_params": [
     "reference",
-    "lib_ROI"
+    "lib_ROI",
+    "tumor_normal_paired",
+    "donor"
   ],
   "gui_params" : {
     "primary": {
