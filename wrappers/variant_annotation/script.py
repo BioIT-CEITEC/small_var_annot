@@ -16,9 +16,9 @@ f.close()
 
 shell.executable("/bin/bash")
 
-version = str(subprocess.Popen("vep 2>&1 | grep \"ensemble-vep\" | cut -f 2 -d \" \"", shell=True, stdout=subprocess.PIPE).communicate()[0], 'utf-8')
+version = str(subprocess.Popen("vep 2>&1 | grep \"ensembl-vep\" | cut -f 2 -d \":\"", shell=True, stdout=subprocess.PIPE).communicate()[0], 'utf-8')
 f = open(log_filename, 'at')
-f.write("## VERSION: variant effect predictor v"+version+"\n")
+f.write("## VERSION: ensembl-vep  :  "+version+"\n")
 f.close()
 
 if sum(1 for line in open(snakemake.input.tsv_for_vep)) > 1:
@@ -80,10 +80,10 @@ if sum(1 for line in open(snakemake.input.tsv_for_vep)) > 1:
                       " --force_overwrite " + \
                       fork_text + " >> " + log_filename + " 2>&1"
 
-            f = open(log_filename, 'at')
-            f.write("## COMMAND: "+command+"\n")
-            f.close()
-            shell(command)
+        f = open(log_filename, 'at')
+        f.write("## COMMAND: "+command+"\n")
+        f.close()
+        shell(command)
 
 
     else:
