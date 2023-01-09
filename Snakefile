@@ -38,16 +38,11 @@ reference_directory = os.path.join(GLOBAL_REF_PATH,config["organism"],config["re
 ##### Config processing #####
 #conversion from new json
 if config["calling_type"] == "somatic":
-    config["format"] = config["somatic_format"]
+    sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
     if config["tumor_normal_paired"]:
-        sample_tab_initial = pd.DataFrame.from_dict(config["samples"],orient="index")
-        sample_tab = pd.DataFrame({"sample_name" : [],"sample_name_normal" : [],"sample_name_tumor" : []})
-        sample_tab["sample_name"]=sample_tab_initial["donor"].unique()
-        for index, row in sample_tab.iterrows():
-            sample_tab.loc[index,"sample_name_normal"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="normal"),"sample_name"].to_string(index=False)
-            sample_tab.loc[index,"sample_name_tumor"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="tumor"),"sample_name"].to_string(index=False)
-    else:
-        sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
+        sample_tab.drop('sample_name', axis=1, inplace=True)
+        sample_tab.rename(columns={'donor': 'sample_name'},inplace=True)
+        sample_tab.drop_duplicates(subset="sample_name",inplace=True)
 else:
     sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
     config["format"] = config["germline_format"]
