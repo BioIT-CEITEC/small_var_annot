@@ -12,7 +12,8 @@
       "final_variant_table.tsv",
       "per_sample_final_var_tabs/*",
       "logs/*",
-      "annotate/*"
+      "annotate/*",
+      "config.json"
     ],
     "inputs_optional":[
       "cohort_data/cohort_variants.tsv"
