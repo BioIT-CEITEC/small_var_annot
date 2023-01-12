@@ -11,7 +11,7 @@ def cohort_data_input(wildcards):
 rule process_and_format_annot_variants:
     input:  var_tabs = expand("{calling_type}_varcalls/{sample_name}.final_variants.tsv", sample_name = sample_tab.sample_name, calling_type = config["calling_type"]),
             annotated = "annotate/all_variants.annotated.processed.tsv",
-            format_file = expand(GLOBAL_REF_PATH + "/general/{calling_type}_small_var_call_format_files/" + config["format"] + ".txt",calling_type = config["calling_type"]),
+            format_file = expand(GLOBAL_REF_PATH + "/general/{calling_type}_small_var_call_format_files/" + config["format"] + ".txt",calling_type = config["calling_type"])[0],
             cohort_data = cohort_data_input
     output: all_vars_xlsx = "final_variant_table.xlsx",
             all_vars_tsv = "final_variant_table.tsv",
@@ -27,7 +27,8 @@ rule process_and_format_annot_variants:
             create_cohort_data = config["create_cohort_data"],
             batch_name = config["entity_name"],
             ref_dir= reference_directory,
-            organism=config["organism"]
+            organism=config["organism"],
+            mut_load_output_filename= "mutation_loads.xlsx",
 
     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
     script: "../wrappers/process_and_format_annot_variants/script.py"

@@ -23,6 +23,7 @@ annotate_with_intervals <- function(var_tab,annot_tab,annotate_cols_names = tail
   location_tab <- var_tab[,list(chrom,start = pos,end = pos)]
   location_tab <- unique(location_tab)
   setnames(annot_tab,names(annot_tab)[1:3],c("chrom", "start", "end"))
+  annot_tab[,chrom := as.character(chrom)]
   setkey(annot_tab, chrom, start, end)
   res <- foverlaps(location_tab, annot_tab, type="any")
   res <- res[,c("chrom","i.start",annotate_cols_names),with = F]
@@ -43,7 +44,8 @@ run_all <- function(args){
   batch_name <- args[8]
   reference_directory <- args[9]
   organism <- args[10]
-  var_files <- args[11:length(args)]
+  mut_load_output_file <- args[11]
+  var_files <- args[12:length(args)]
 
 
   #load format config file
@@ -56,13 +58,15 @@ run_all <- function(args){
   
   #load processed annotated vars
   annot_tab <- fread(annot_file)
-  
+
+
   #load and filter vars from all samples
-  sample_filename_pattern <- paste0(".*\\/(.*).variants.tsv")
+  sample_filename_pattern <- paste0(".*\\/(.*).final.variants.tsv")
   all_var_tab <- fread_vector_of_files(var_files,regex = sample_filename_pattern)
   all_var_tab <- filter_variants(all_var_tab,VF_threshold = VF_threshold)
   
   final_unformated_tab <- merge(all_var_tab,annot_tab,by = "var_name",allow.cartesian=TRUE)
+  final_unformated_tab[,chrom := as.character(chrom)]
 
   # TMB for Human only
   if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO") && organism == "homo_sapiens"){
@@ -268,7 +272,7 @@ write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_f
 
 }
 
-compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs,reference){
+compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs,reference_directory){
   variant_tab <- unique(variant_tab,by = c("sample","var_name"))
   mut_load_config <- as.data.table(tstrsplit(global_format_configs[V1 == "mut_load"]$V2,split = "::"))
 
@@ -278,10 +282,7 @@ compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_
     filter_text <- trimws(mut_load_config[index,]$V3)
     filtered_var_table <- eval(parse(text = paste0("variant_tab[",filter_text,"]")))
 
-    # add reference path /mnt/references/homsap/GRCh37-p13
-    mut_definitions <- paste0("/mnt/references/homsap/",reference,"/")
-    intervals <- fread(paste0(mut_definitions,mut_load_config[index,]$V2))
-
+    intervals <- fread(paste0(reference_directory,"/",mut_load_config[index,]$V2))
     intervals[,is_in := "x"]
 
     filtered_var_table <- annotate_with_intervals(filtered_var_table,intervals,annotate_cols_names = "is_in")
@@ -292,6 +293,7 @@ compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_
     setnames(mut_load_res_tab,"mutation_load",mut_load_config[index,]$V1)
 
   }
+
   openxlsx::write.xlsx(mut_load_res_tab,file = mut_load_output_file)
 }
 

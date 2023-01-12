@@ -32,6 +32,7 @@ command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_fo
             snakemake.params.batch_name + " " +\
             snakemake.params.ref_dir + " " +\
             snakemake.params.organism + " " +\
+            snakemake.params.mut_load_output_filename + " " +\
             " ".join(snakemake.input.var_tabs) +\
             " >> " + log_filename + " 2>&1"
 
