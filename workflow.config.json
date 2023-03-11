@@ -4,6 +4,10 @@
     "version": 1.0,
     "label":"Small variant annotation",
     "type":"var_call",
+    "run_parameters": {
+      "cpu": 10,
+      "memory": 100
+    },
     "inputs":[
       "*_varcalls/*.final_variants.tsv"
     ],
