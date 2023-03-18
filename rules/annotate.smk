@@ -34,7 +34,7 @@ rule variant_annotation:
 
 rule custom_annotation:
     input:  annotated = "annotate/all_variants.annotated.tsv",
-            format_file = GLOBAL_REF_PATH + "/general/germline_small_var_call_format_files/" + config["format"] + ".txt",
+            format_file = expand(GLOBAL_REF_PATH + "/general/{calling_type}_small_var_call_format_files/" + config["format"] + ".txt",calling_type = config["calling_type"])[0],
     output: custom_annotated = "annotate/all_variants.annotated.processed.tsv"
     log:    "logs/custom_annotation.log"
     threads: 10
