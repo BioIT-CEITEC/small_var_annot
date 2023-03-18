@@ -61,6 +61,7 @@ if sum(1 for line in open(snakemake.input.tsv_for_vep)) > 1:
                            " --everything "  + merged +\
                            " --fasta "+ snakemake.params.ref +\
                            " --offline --assembly " + assembly +\
+                           " --cache " +\
                            " --cache_version " + str(cache_version) +\
                            " --input_file " + snakemake.input.tsv_for_vep +\
                            " --output_file " + snakemake.output.annotated +\
@@ -74,6 +75,7 @@ if sum(1 for line in open(snakemake.input.tsv_for_vep)) > 1:
                       " --fasta " + snakemake.params.ref + \
                       " --species " + organism + \
                       " --offline --assembly " + assembly + \
+                      " --cache " +\
                       " --cache_version " + str(cache_version) + \
                       " --input_file " + snakemake.input.tsv_for_vep + \
                       " --output_file " + snakemake.output.annotated + \
