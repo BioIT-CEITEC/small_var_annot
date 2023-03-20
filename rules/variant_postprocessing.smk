@@ -29,7 +29,7 @@ rule process_and_format_annot_variants:
             ref_dir= reference_directory,
             organism=config["organism"],
             mut_load_output_filename= "mutation_loads.xlsx",
-
+            isWGS=config["lib_ROI"]
     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
     script: "../wrappers/process_and_format_annot_variants/script.py"
 

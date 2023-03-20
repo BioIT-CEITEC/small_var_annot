@@ -44,6 +44,7 @@ rule custom_annotation:
             reference_name = config["reference"],
             format = config["format"],
             custom_DB_folder = expand("{ref_dir}/annot/custom_new2",ref_dir = reference_directory)[0],
-            anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])[0]
+            anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])[0],
+            isWGS=config["lib_ROI"]
     conda:  "../wrappers/custom_annotation/env.yaml"
     script: "../wrappers/custom_annotation/script.py"

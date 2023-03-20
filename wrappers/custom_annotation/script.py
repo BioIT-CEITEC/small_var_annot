@@ -10,7 +10,8 @@ f = open(log_filename, 'wt')
 f.write("\n##\n## RULE: custom_annotation \n##\n")
 f.close()
 
-command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotation.R "+\
+if snakemake.params.isWGS == "wgs" or snakemake.params.isWGS == "WGS":
+    command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotation_WGS.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.custom_annotated + " " +\
             snakemake.params.reference_name + " " +\
@@ -19,6 +20,17 @@ command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotat
             snakemake.params.custom_DB_folder + " " +\
             snakemake.input.format_file +\
             " >> " + log_filename + " 2>&1"
+else:
+    command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotation.R "+\
+            snakemake.input.annotated + " " +\
+            snakemake.output.custom_annotated + " " +\
+            snakemake.params.reference_name + " " +\
+            snakemake.params.anno_gtf + " " +\
+            snakemake.params.resources_dir + " " +\
+            snakemake.params.custom_DB_folder + " " +\
+            snakemake.input.format_file +\
+            " >> " + log_filename + " 2>&1"
+
 
 f = open(log_filename, 'at')
 f.write("## COMMAND: "+command+"\n")

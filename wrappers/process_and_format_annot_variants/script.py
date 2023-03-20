@@ -21,7 +21,23 @@ if snakemake.params.create_cohort_data:
 else:
     create_cohort_data = "dont_save_cohort_data"
 
-command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_format_annot_variants.R "+\
+if snakemake.params.isWGS == "wgs" or snakemake.params.isWGS == "WGS":
+    command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_format_annot_variants_WGS.R "+\
+            snakemake.input.annotated + " " +\
+            snakemake.output.all_vars_tsv + " " +\
+            os.path.dirname(snakemake.output.per_sample_var_tabs[0]) + " " +\
+            snakemake.input.format_file + " " +\
+            snakemake.params.min_variant_frequency + " " +\
+            cohort_data_filename + " " +\
+            create_cohort_data + " " +\
+            snakemake.params.batch_name + " " +\
+            snakemake.params.ref_dir + " " +\
+            snakemake.params.organism + " " +\
+            snakemake.params.mut_load_output_filename + " " +\
+            " ".join(snakemake.input.var_tabs) +\
+            " >> " + log_filename + " 2>&1"
+else:
+    command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_format_annot_variants.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.all_vars_tsv + " " +\
             os.path.dirname(snakemake.output.per_sample_var_tabs[0]) + " " +\
