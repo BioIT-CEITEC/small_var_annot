@@ -57,8 +57,9 @@ run_all <- function(args){
   col_config <- fread(format_file,skip = "orig_name")
   # add gnomad WGS column to format
   x <- which(col_config$orig_name=="gnomADe_NFE_AF")
+  if(!length(x)){x <- which(col_config$orig_name=="gnomAD_NFE_AF")}
   col_config <- as.data.table(rbind(col_config[1:x,],
-                                    data.frame(orig_name="gnomADg_NFE_AF", new_name="gnomAD_WGS_NFE_AF"),
+                                    data.frame(orig_name="gnomADg_NFE_AF", new_name="gnomAD_WGS_NFE"),
                                     col_config[(x+1):nrow(col_config),]
   ))
   col_config[,orig_name := sub(".*::","",orig_name)]
@@ -76,11 +77,11 @@ run_all <- function(args){
   final_unformated_tab[,chrom := as.character(chrom)]
   
   # TMB for Human only
-  # if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO") && organism == "homo_sapiens"){
-  #   compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs,reference_directory)
-  # } else {
-  #   system(paste0("touch ",mut_load_output_file))
-  # }
+  if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO") && organism == "homo_sapiens"){
+    compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs,reference_directory)
+  } else {
+    system(paste0("touch ",mut_load_output_file))
+  }
   
   
   # COHORT ? skip?
@@ -239,6 +240,12 @@ format_final_var_table  <- function(variant_tab,global_format_configs,col_config
     variant_tab <- variant_tab[is.na(gnomAD_NFE),gnomAD_NFE := 0]
   }
   
+  if(any(names(variant_tab) == "gnomAD_WGS_NFE")){
+    variant_tab <- suppressWarnings(variant_tab[,gnomAD_WGS_NFE := as.numeric(gnomAD_WGS_NFE)])
+    variant_tab <- variant_tab[is.na(gnomAD_WGS_NFE),gnomAD_WGS_NFE := 0]
+  }
+  
+  
   return(variant_tab)
 }
 
@@ -313,8 +320,8 @@ write_out_per_chromosome  <- function(variant_tab,per_sample_results_dir,full_fo
   }
  
   #create dirs
-  if(!dir.exists(paste0(per_sample_results_dir,"/chrom_separated/"))){
-    dir.create(paste0(per_sample_results_dir,"/chrom_separated/"))
+  if(!dir.exists(paste0(per_sample_results_dir,"/chrom_separated_rare/"))){
+    dir.create(paste0(per_sample_results_dir,"/chrom_separated_rare/"))
   }
   
   
@@ -336,12 +343,12 @@ write_out_per_chromosome  <- function(variant_tab,per_sample_results_dir,full_fo
     }
     
     #create dirs for sample
-    if(!dir.exists(paste0(per_sample_results_dir,"/chrom_separated/",my_sample))){
-      dir.create(paste0(per_sample_results_dir,"/chrom_separated/",my_sample))
+    if(!dir.exists(paste0(per_sample_results_dir,"/chrom_separated_rare/",my_sample))){
+      dir.create(paste0(per_sample_results_dir,"/chrom_separated_rare/",my_sample))
     }
     
-    ##filter gnomad_NFE < 1%
-    sample_tab <- sample_tab[gnomAD_NFE < 0.01,]
+    ##filter gnomAD_WGS_NFE < 1%
+    sample_tab <- sample_tab[gnomAD_WGS_NFE < 0.01,]
     
     #get chromosome and write each chromosome on separate spreadsheet
     sample_tab$chromosome <- unlist(tstrsplit(sample_tab$var_name,split = "_")[[1]])
@@ -349,14 +356,14 @@ write_out_per_chromosome  <- function(variant_tab,per_sample_results_dir,full_fo
     unik_chromosomes <- unique(sample_tab$chromosome)[order(match(unique(sample_tab$chromosome),full_chrom))]
     for (contig in full_chrom){
       DF <- sample_tab[chromosome == contig,]
-      fwrite(DF,file = paste0(per_sample_results_dir,"/chrom_separated/",my_sample,"/",contig,"_variants.tsv"),sep = "\t")
+      fwrite(DF,file = paste0(per_sample_results_dir,"/chrom_separated_rare/",my_sample,"/",contig,"_variants.tsv"),sep = "\t")
       message(sprintf("%s chromosome TSV written", contig ))
     }
     
     #write scaffolds together
     scaffolds <- setdiff(unik_chromosomes,full_chrom)
     DF <- sample_tab[chromosome %in% scaffolds,]
-    fwrite(DF,file = paste0(per_sample_results_dir,"/chrom_separated/",my_sample,"/","scaffolds","_variants.tsv"),sep = "\t")
+    fwrite(DF,file = paste0(per_sample_results_dir,"/chrom_separated_rare/",my_sample,"/","scaffolds","_variants.tsv"),sep = "\t")
     message("scaffolds TSV written")
     #
     
