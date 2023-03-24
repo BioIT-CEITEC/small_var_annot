@@ -10,7 +10,7 @@ GLOBAL_REF_PATH = config["globalResources"]
 # Reference processing
 #
 
-if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "RNA":
+if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "rna":
     # setting reference from lib_ROI
     f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
     lib_ROI_dict = json.load(f)

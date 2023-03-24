@@ -10,7 +10,7 @@ f = open(log_filename, 'wt')
 f.write("\n##\n## RULE: custom_annotation \n##\n")
 f.close()
 
-if snakemake.params.isWGS == "wgs" or snakemake.params.isWGS == "WGS" or os.path.getsize(snakemake.input.annotated) > 5 * 10 ** 9:
+if snakemake.params.isWGS == "wgs" or snakemake.params.isWGS == "rna" or os.path.getsize(snakemake.input.annotated) > 5 * 10 ** 9:
     command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotation_WGS.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.custom_annotated + " " +\

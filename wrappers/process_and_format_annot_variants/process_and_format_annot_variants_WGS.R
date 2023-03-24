@@ -56,7 +56,7 @@ run_all <- function(args){
   
   col_config <- fread(format_file,skip = "orig_name")
   # add gnomad WGS column to format
-  x <- which(col_config$orig_name=="gnomAD_NFE_AF")
+  x <- which(col_config$orig_name=="gnomADe_NFE_AF")
   col_config <- as.data.table(rbind(col_config[1:x,],
                                     data.frame(orig_name="gnomADg_NFE_AF", new_name="gnomAD_WGS_NFE_AF"),
                                     col_config[(x+1):nrow(col_config),]

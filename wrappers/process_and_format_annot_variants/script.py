@@ -21,7 +21,7 @@ if snakemake.params.create_cohort_data:
 else:
     create_cohort_data = "dont_save_cohort_data"
 
-if snakemake.params.isWGS == "wgs" or snakemake.params.isWGS == "WGS":
+if snakemake.params.isWGS == "wgs" or snakemake.params.isWGS == "rna" or os.path.getsize(snakemake.input.annotated) > 5 * 10 ** 9:
     command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_format_annot_variants_WGS.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.all_vars_tsv + " " +\
