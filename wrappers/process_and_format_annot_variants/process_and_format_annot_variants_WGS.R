@@ -295,7 +295,7 @@ write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_f
       fwrite(sample_tab,file = paste0(per_sample_results_dir,"/",my_sample,".variants.tsv"),sep = "\t")#WGS new
     }
   }
-  
+  ## create empty files
   if(length(empty_sample_names) > 0){
     sample_tab <- variant_tab[0,]
     if(!any("sample" == col_config$orig_name)){
@@ -304,9 +304,9 @@ write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_f
     
     
     for(empty_sample_name in empty_sample_names){
-      openxlsx::write.xlsx(data.frame(),file = paste0(per_sample_results_dir,"/",my_sample,".variants.xlsx"))#just empty, write tsv instead
-      fwrite(sample_tab,file = paste0(per_sample_results_dir,"/",my_sample,".variants.tsv"),sep = "\t")#new
-      fwrite(sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",my_sample,".variants.tsv"),sep = "\t")
+      openxlsx::write.xlsx(data.frame(),file = paste0(per_sample_results_dir,"/",empty_sample_name,".variants.xlsx"))#just empty, write tsv instead
+      #fwrite(sample_tab,file = paste0(per_sample_results_dir,"/",empty_sample_name,".variants.tsv"),sep = "\t")#new
+      fwrite(sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",empty_sample_name,".variants.tsv"),sep = "\t")
     }
   }
   
