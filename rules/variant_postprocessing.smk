@@ -26,7 +26,7 @@ rule process_and_format_annot_variants:
             anno_gtf = config["organism_gtf"],
             create_cohort_data = config["create_cohort_data"],
             batch_name = config["entity_name"],
-            ref_dir= reference_directory,
+            ref_dir= config["reference_dir"],
             organism=config["organism"],
             mut_load_output_filename= "mutation_loads.xlsx",
             isWGS=config["lib_ROI"]

@@ -24,7 +24,7 @@ if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "rna":
     config["organism_gtf"] = config["gtf_vc"]
     config["organism_fasta"] = config["fasta_vc"]
     config["organism_vep"] = config["vep_vc"]
-
+    config["reference_dir"] = config["ref_dir"]
 ########################################################################################################################
 ##### Config processing #####
 #conversion from new json
