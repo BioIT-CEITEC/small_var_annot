@@ -20,8 +20,8 @@ rule variant_annotation:
     threads: 20
     resources:
         mem_mb=8000
-    params: ref = config["fasta_vc"],
-            vep_dir = config["vep_vc"],
+    params: ref = config["organism_fasta"],
+            vep_dir = config["organism_vep"],
             ref_name = config["reference"],
             organism_name = config["organism"],
             format = config["format"],
@@ -44,7 +44,7 @@ rule custom_annotation:
             reference_name = config["reference"],
             format = config["format"],
             custom_DB_folder = config["custom_DB_folder"],
-            anno_gtf = config["gtf_vc"],
-            isWGS=config["folder_name"]
+            anno_gtf = config["organism_gtf"],
+            isWGS=config["lib_ROI"]
     conda:  "../wrappers/custom_annotation/env.yaml"
     script: "../wrappers/custom_annotation/script.py"

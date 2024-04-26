@@ -20,9 +20,11 @@ tool_dir = BR.load_tooldir()
 config = BR.load_organism()
 
 if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "rna":
-    config["reference"] = config["ref"]
+    config["reference"] = config["ref_name"]
+    config["organism_gtf"] = config["gtf_vc"]
+    config["organism_fasta"] = config["fasta_vc"]
+    config["organism_vep"] = config["vep_vc"]
 
-# Samples
 ########################################################################################################################
 ##### Config processing #####
 #conversion from new json
