@@ -21,14 +21,14 @@ rule variant_annotation:
     resources:
         mem_mb=8000
     params: ref = config["organism_fasta"],
-            vep_dir = config["organism_vep"],
+            vep_dir = config["organism_vep_dir"],
             ref_name = config["reference"],
             organism_name = config["organism"],
             format = config["format"],
             not_use_merged = config["not_use_merged"],
-            CADD_DB_SNVs = config["cadd_db_snvs"],
-            CADD_DB_indels = config["cadd_db_indels"],
-            dir_plugins = config["dir_plugins_vep"],
+            CADD_DB_SNVs = config["organism_cadd_db_snvs"],
+            CADD_DB_indels = config["organism_cadd_db_indels"],
+            dir_plugins = config["organism_vep_dir"] + "/VEP_plugins/",
     conda:  "../wrappers/variant_annotation/env.yaml"
     script: "../wrappers/variant_annotation/script.py"
 
@@ -43,7 +43,7 @@ rule custom_annotation:
     params: resources_dir = workflow.basedir + "/resources",
             reference_name = config["reference"],
             format = config["format"],
-            custom_DB_folder = config["custom_DB_folder"],
+            custom_DB_folder = config["organism_custom_DB_folder"],
             anno_gtf = config["organism_gtf"],
             isWGS=config["lib_ROI"]
     conda:  "../wrappers/custom_annotation/env.yaml"
