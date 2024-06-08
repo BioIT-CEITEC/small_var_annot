@@ -14,7 +14,7 @@ if snakemake.params.isWGS == "wgs" or snakemake.params.isWGS == "rna" or os.path
     command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotation_WGS.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.custom_annotated + " " +\
-            snakemake.params.reference_name + " " +\
+            snakemake.params.assembly + " " +\
             snakemake.params.anno_gtf + " " +\
             snakemake.params.resources_dir + " " +\
             snakemake.params.custom_DB_folder + " " +\
@@ -24,7 +24,7 @@ else:
     command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/custom_annotation.R "+\
             snakemake.input.annotated + " " +\
             snakemake.output.custom_annotated + " " +\
-            snakemake.params.reference_name + " " +\
+            snakemake.params.assembly + " " +\
             snakemake.params.anno_gtf + " " +\
             snakemake.params.resources_dir + " " +\
             snakemake.params.custom_DB_folder + " " +\

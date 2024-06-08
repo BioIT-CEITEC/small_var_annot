@@ -22,7 +22,7 @@ rule variant_annotation:
         mem_mb=8000
     params: ref = config["organism_fasta"],
             vep_dir = config["organism_vep_dir"],
-            ref_name = config["reference"],
+            assembly = config["assembly"],
             organism_name = config["organism"],
             format = config["format"],
             not_use_merged = config["not_use_merged"],
@@ -42,6 +42,7 @@ rule custom_annotation:
         mem_mb=8000
     params: resources_dir = workflow.basedir + "/resources",
             reference_name = config["reference"],
+            assembly= config["assembly"],
             format = config["format"],
             custom_DB_folder = config["organism_custom_DB_folder"],
             anno_gtf = config["organism_gtf"],

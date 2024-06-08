@@ -335,7 +335,7 @@ run_all <- function(args){
   format_file <- args[7]
   
   
-  ref_name <- gsub("\\-.*","",ref_name)
+#   ref_name <- gsub("\\-.*","",ref_name)
   
   col_config <- fread(format_file,skip = "orig_name")
   # add gnomad WGS column to format

@@ -4,7 +4,7 @@ Sys.setenv("R_ZIPCMD" = "zip")
 
 #DEFINE EXTRACTED DBs from Existing_variation vector
 extracted_DBs <<- c("snpDB","COSMIC","HGMD","NHLBI_ESP")
-extracted_DBs_IDs <<- c("rs","COSM","^[CHB][IMSGXDRP][0-9]+$","ESP")
+extracted_DBs_IDs <<- c("rs","COS[VM]","^[CHB][IMSGXDRP][0-9]+$","ESP")
 
 aa_names_tab <<- data.table(three = c("Ala" ,"Arg", "Asn" ,"Asp", "Cys", "Glu", "Gln", "Gly" ,"His" ,"Ile", "Leu", "Lys", "Met", "Phe", "Pro", "Ser" ,"Thr", "Trp" ,"Tyr" ,"Val",".fs.*","Ter"),
                             one = c("A", "R","N" ,"D" ,"C","E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V","fs","X"))
@@ -52,14 +52,17 @@ extract_existing_variations_to_separate_cols <- function(Existing_variation_vect
   
   res_mat <- sapply(split_variant_list,function(x) {
     if(x[1] != "-"){
-      return(sapply(extracted_DBs_IDs,function(y) paste(x[grep(y,x)],collapse = ",")))
+      extracted_DB_vars <- lapply(extracted_DBs_IDs,function(y) x[grep(y,x)])
+      other_vars <- paste(setdiff(x,unlist(extracted_DB_vars)),collapse = ",")
+      extracted_DB_vars <- sapply(extracted_DB_vars,function(y) paste(y,collapse = ","))
+      return(c(extracted_DB_vars,other_vars))
     } else {
-      return(character(length(extracted_DBs_IDs)))
+      return(character(length(extracted_DBs_IDs) + 1))
     }
   })
   res_mat <- t(res_mat)
   res_tab <- as.data.table(res_mat)
-  names(res_tab) <- extracted_DBs
+  names(res_tab) <- c(extracted_DBs,"other_known_vars")
   return(res_tab)
 }
 
@@ -176,6 +179,10 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   
   if(any(names(annot_tab) == "CLIN_SIG")){
     load(paste0(custom_DB_folder,"/clinvar.Rdata"))
+    clinvar_tab <- fread(paste0(custom_DB_folder,"/../clinvar.vcf.gz"))
+    clinvar_tab <- clinvar_tab[,.(var_name = paste0(`#CHROM`,"_",POS,"_",REF,"/",ALT),
+                                  CLNSIG = gsub(".*CLNSIG=(.*?);.*","\\1",INFO),
+                                  CLNDN = gsub(".*CLNDN=(.*?);.*","\\1",INFO))]
     annot_tab <- merge(annot_tab,clinvar_tab,by = "var_name",all.x = T)
     annot_tab[,CLIN_SIG := NULL]
   }
@@ -312,7 +319,7 @@ run_all <- function(args){
   format_file <- args[7]
 
 
-  ref_name <- gsub("\\-.*","",ref_name)
+#   ref_name <- gsub("\\-.*","",ref_name)
   
   col_config <- fread(format_file,skip = "orig_name")
   #load and process annotated vars
@@ -325,12 +332,12 @@ run_all <- function(args){
 
 # develop and test WES 86
 # args <- character(6)
-# args[1] <- "annotate/all_variants.annotated.tsv"
-# args[2] <- "annotate/all_variants.annotated.processed.tsv"
-# args[3] <- "GRCh37-p13"
+# args[1] <- "/Volumes/share/share/710000-CEITEC/713000-cmm/713004-genomics/clg/sequencing_results/projects/BRONCO_panel/104/annotate/all_variants.annotated.tsv"
+# args[2] <- "all_variants.annotated.processed.tsv"
+# args[3] <- "GRCh37"
 # args[4] <- "/mnt/ssd/ssd_3/references/homsap/GRCh37-p13/annot/GRCh37-p13.gtf "
-# args[5] <- "/home/402182/BioRoots-somaticSeq/workflows/paired_somatic_small_var_call/resources"
-# args[6] <- "/home/402182/BioRoots-somaticSeq/workflows/paired_somatic_small_var_call/resources/formats/slaby_children_soma.txt"
+# args[5] <- "/Volumes/share/share/710000-CEITEC/713000-cmm/713016-bioit/resources/references/homo_sapiens/GRCh37/others/custom_new2"
+# args[6] <- "/Volumes/share/share/710000-CEITEC/713000-cmm/713016-bioit/base"
 
 #run as Rscript
 # 

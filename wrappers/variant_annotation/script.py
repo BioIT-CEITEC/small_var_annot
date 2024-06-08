@@ -22,7 +22,7 @@ f.write("## VERSION: ensembl-vep  :  "+version+"\n")
 f.close()
 
 if sum(1 for line in open(snakemake.input.tsv_for_vep)) > 1:
-    assembly = re.sub("\-.*","",snakemake.params.ref_name)
+    assembly = snakemake.params.assembly
 
     if snakemake.threads > 1:
         fork_text = "--fork " + str(snakemake.threads)
