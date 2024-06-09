@@ -178,11 +178,8 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   }
   
   if(any(names(annot_tab) == "CLIN_SIG")){
-    load(paste0(custom_DB_folder,"/clinvar.Rdata"))
-    clinvar_tab <- fread(paste0(custom_DB_folder,"/../clinvar.vcf.gz"))
-    clinvar_tab <- clinvar_tab[,.(var_name = paste0(`#CHROM`,"_",POS,"_",REF,"/",ALT),
-                                  CLNSIG = gsub(".*CLNSIG=(.*?);.*","\\1",INFO),
-                                  CLNDN = gsub(".*CLNDN=(.*?);.*","\\1",INFO))]
+#     load(paste0(custom_DB_folder,"/clinvar.Rdata"))
+    clinvar_tab <- fread(paste0(custom_DB_folder,"/clinvar_annot.tsv"))
     annot_tab <- merge(annot_tab,clinvar_tab,by = "var_name",all.x = T)
     annot_tab[,CLIN_SIG := NULL]
   }
