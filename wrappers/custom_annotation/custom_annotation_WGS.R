@@ -6,7 +6,7 @@ Sys.setenv("R_ZIPCMD" = "zip")
 
 #DEFINE EXTRACTED DBs from Existing_variation vector
 extracted_DBs <<- c("snpDB","COSMIC","HGMD","NHLBI_ESP")
-extracted_DBs_IDs <<- c("rs","COSM","^[CHB][IMSGXDRP][0-9]+$","ESP")
+extracted_DBs_IDs <<- c("rs","COS[VM]","^[CHB][IMSGXDRP][0-9]+$","ESP")
 
 aa_names_tab <<- data.table(three = c("Ala" ,"Arg", "Asn" ,"Asp", "Cys", "Glu", "Gln", "Gly" ,"His" ,"Ile", "Leu", "Lys", "Met", "Phe", "Pro", "Ser" ,"Thr", "Trp" ,"Tyr" ,"Val",".fs.*","Ter"),
                             one = c("A", "R","N" ,"D" ,"C","E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V","fs","X"))
@@ -188,7 +188,7 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
     }
     
     if(any(names(annot_tab) == "CLIN_SIG")){
-      load(paste0(custom_DB_folder,"/clinvar.Rdata"))
+      clinvar_tab <- fread(paste0(custom_DB_folder,"/clinvar_annot.tsv"))
       annot_tab <- merge(annot_tab,clinvar_tab,by = "var_name",all.x = T)
       annot_tab[,CLIN_SIG := NULL]
     }
