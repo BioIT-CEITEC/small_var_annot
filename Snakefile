@@ -30,8 +30,6 @@ if config["calling_type"] == "somatic":
         sample_tab.drop_duplicates(subset="sample_name",inplace=True)
 else:
     sample_tab = BR.load_sample()
-    config["format"] = config["germline_format"]
-
 #######################################################################################################################
 
 # DEFAULT VALUES

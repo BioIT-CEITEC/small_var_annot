@@ -37,7 +37,8 @@
   ],
   "requested_params": [
     "reference",
-    "lib_ROI"
+    "lib_ROI",
+    "tumor_normal_paired"
   ],
   "gui_params" : {
     "primary": {
@@ -50,40 +51,17 @@
           "somatic": "Somatic"
         }
       },
-      "germline_format": {
+      "format": {
         "label": "Result variant table format",
         "type": "enum",
-        "default": "default",
-        "list": ##INCLUDE:general/germline_small_var_call_format_files/format_info.json##,
-        "conditions": {
-          "relevance": {
-            "operand": "equal",
-            "negation": false,
-            "values": {
-              "calling_type": "germline"
-            }
+        "dynamicEnumName": "organism",
+        "filters": {
+          "group": {
+            "param": "calling_type",
+            "type": "value",
+            "showGroupLabel": false
           }
         }
-      },
-      "somatic_format": {
-        "label": "Result variant table format",
-        "type": "enum",
-        "default": "default",
-        "list": ##INCLUDE:general/somatic_small_var_call_format_files/format_info.json##,
-        "conditions": {
-          "relevance": {
-            "operand": "equal",
-            "negation": false,
-            "values": {
-              "calling_type": "somatic"
-            }
-          }
-        }
-      },
-      "tumor_normal_paired": {
-        "label": "Samples are tumor-normal paired",
-        "type": "bool",
-        "default": true
       }
     },
     "detailed": {
