@@ -54,7 +54,7 @@
       "format": {
         "label": "Result variant table format",
         "type": "enum",
-        "dynamicEnumName": "organism",
+        "dynamicEnumName": "small_var_format",
         "filters": {
           "group": {
             "param": "calling_type",
