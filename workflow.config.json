@@ -43,7 +43,7 @@
     "tumor_normal_paired"
   ],
   "gui_params" : {
-    "primary": {
+    "detailed": {
       "use_cohort_data": {
         "label": "Load variants from previous experiments for annotations. need file: cohort_data/cohort_variants.tsv",
         "type": "bool",
