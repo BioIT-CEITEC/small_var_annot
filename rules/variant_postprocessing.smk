@@ -20,8 +20,7 @@ rule process_and_format_annot_variants:
     threads: 10
     resources:
         mem_mb=8000
-    params: reference = config["reference"],
-            min_variant_frequency = str(config["min_variant_frequency"]),
+    params: min_variant_frequency = str(config["min_variant_frequency"]),
             format = config["format"],
             anno_gtf = config["organism_gtf"],
             create_cohort_data = config["create_cohort_data"],
