@@ -41,7 +41,6 @@ rule custom_annotation:
     resources:
         mem_mb=8000
     params: resources_dir = workflow.basedir + "/resources",
-            reference_name = config["reference"],
             assembly= config["assembly"],
             format = config["format"],
             custom_DB_folder = config["organism_custom_DB_folder"],
