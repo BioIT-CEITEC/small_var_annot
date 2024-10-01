@@ -1,7 +1,7 @@
 {
   "workflow_description": {
     "name":"small_var_annot",
-    "version": 1.0,
+    "version": 3.0,
     "label":"Small variant annotation",
     "type":"var_call",
     "run_parameters": {
