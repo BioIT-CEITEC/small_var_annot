@@ -40,7 +40,8 @@
     "assembly",
     "release",
     "lib_ROI",
-    "tumor_normal_paired"
+    "tumor_normal_paired",
+    "format"
   ],
   "gui_params" : {
     "detailed": {
