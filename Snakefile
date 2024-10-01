@@ -10,7 +10,7 @@ GLOBAL_REF_PATH = config["globalResources"]
 
 ##### BioRoot utilities #####
 module BR:
-    snakefile: gitlab("bioroots/bioroots_utilities", path="bioroots_utilities.smk",branch="master")
+    snakefile: github("BioIT-CEITEC/bioroots_utilities", path="bioroots_utilities.smk",branch="master")
     config: config
 
 use rule * from BR as other_*
