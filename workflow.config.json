@@ -41,8 +41,7 @@
     "release",
     "lib_ROI",
     "tumor_normal_paired",
-    "calling_type",
-    "format"
+    "calling_type"
   ],
   "gui_params" : {
     "detailed": {
