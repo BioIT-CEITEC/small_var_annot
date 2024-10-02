@@ -44,6 +44,20 @@
     "calling_type"
   ],
   "gui_params" : {
+    "primary": {
+      "format": {
+        "label": "Result variant table format",
+        "type": "enum",
+        "dynamicEnumName": "small_var_format",
+        "filters": {
+          "group": {
+            "param": "calling_type",
+            "type": "value",
+            "showGroupLabel": false
+          }
+        }
+      }
+    },
     "detailed": {
       "use_cohort_data": {
         "label": "Load variants from previous experiments for annotations. need file: cohort_data/cohort_variants.tsv",
