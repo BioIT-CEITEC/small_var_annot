@@ -224,7 +224,8 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   consequence_tab <- fread(paste0(resources_dir,"/consequences_tab.tsv"),header = F)
   consequence_tab[,consequence_index := seq_along(V1)]
   consequence_map <- data.table(Consequence = unique(annot_tab$Consequence),V1 = sapply(strsplit(unique(annot_tab$Consequence),","),head,1))
-  consequence_map <- merge(consequence_map,consequence_tab[,list(V1,consequence_index)],by = "V1")
+  ##  all.x=TRUE 28.7.2025 change to include ALL variants, not only those neccessary in the consequences_tab.tsv
+  consequence_map <- merge(consequence_map,consequence_tab[,list(V1,consequence_index)],by = "V1", all.x=TRUE)
   annot_tab <- merge(annot_tab,consequence_map[,list(Consequence,consequence_index)],by = "Consequence")
   annot_tab[,specific_transcript := Feature %in% gene_trans_spec]
   
