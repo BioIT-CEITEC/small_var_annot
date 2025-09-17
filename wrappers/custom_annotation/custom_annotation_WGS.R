@@ -257,6 +257,7 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
       annot_tab[, MANE_PRESENT := ifelse(MANE_SELECT == ".", "no", "yes")]
       columns_to_order <- c("specific_transcript","is_protein_coding","MANE_PRESENT","consequence_index","CANONICAL")  
     } else {
+      annot_tab[, MANE_SELECT := "."]
       columns_to_order <- c("specific_transcript","is_protein_coding","SOURCE","consequence_index","CANONICAL")  
     }                                       
                                        
