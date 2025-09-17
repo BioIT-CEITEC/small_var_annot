@@ -242,8 +242,10 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   
   annot_tab[,non_protein_coding_to_remove := non_protein_to_remove(is_protein_coding),by = c("var_name")]
   annot_tab <- annot_tab[non_protein_coding_to_remove == F]
+  annot_tab[, MANE_PRESENT := ifelse(MANE_SELECT == ".", "no", "yes")]
+                                   
   
-  columns_to_order <- c("specific_transcript","is_protein_coding","SOURCE","consequence_index","CANONICAL")
+  columns_to_order <- c("specific_transcript","is_protein_coding","MANE_PRESENT","consequence_index","CANONICAL")
   order_direction <- c(-1,-1,-1,1,-1)
   order_direction <- order_direction[columns_to_order %in% names(annot_tab)]
   columns_to_order <- columns_to_order[columns_to_order %in% names(annot_tab)]
