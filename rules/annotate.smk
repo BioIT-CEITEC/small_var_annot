@@ -20,31 +20,31 @@ rule variant_annotation:
     threads: 20
     resources:
         mem_mb=8000
-    params: ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference"])[0],
-            vep_dir = expand("{ref_dir}/annot/vep",ref_dir = reference_directory)[0],
-            ref_name = config["reference"],
+    params: ref = config["organism_fasta"],
+            vep_dir = config["organism_vep_dir"],
+            assembly = config["assembly"],
             organism_name = config["organism"],
             format = config["format"],
             not_use_merged = config["not_use_merged"],
-            CADD_DB_SNVs = expand("{ref_dir}/annot/vep/CADD_scores_DB/whole_genome_SNVs.tsv.gz",ref_dir = reference_directory)[0],
-            CADD_DB_indels = expand("{ref_dir}/annot/vep/CADD_scores_DB/gnomad.genomes.r3.0.indel.tsv.gz",ref_dir = reference_directory)[0],
-            dir_plugins = expand("{ref_dir}/annot/vep/VEP_plugins",ref_dir = reference_directory)[0],
+            CADD_DB_SNVs = config["organism_cadd_db_snvs"],
+            CADD_DB_indels = config["organism_cadd_db_indels"],
+            dir_plugins = config["organism_vep_dir"] + "/VEP_plugins/",
     conda:  "../wrappers/variant_annotation/env.yaml"
     script: "../wrappers/variant_annotation/script.py"
 
 rule custom_annotation:
     input:  annotated = "annotate/all_variants.annotated.tsv",
-            format_file = expand(GLOBAL_REF_PATH + "/general/{calling_type}_small_var_call_format_files/" + config["format"] + ".txt",calling_type = config["calling_type"])[0],
+            format_file = expand(config["tooldir"] + "/variant_calling/{calling_type}_small_var_call_format_files/" + config["format"] + ".txt",calling_type = config["calling_type"])[0],
     output: custom_annotated = "annotate/all_variants.annotated.processed.tsv"
     log:    "logs/custom_annotation.log"
     threads: 10
     resources:
         mem_mb=8000
     params: resources_dir = workflow.basedir + "/resources",
-            reference_name = config["reference"],
+            assembly= config["assembly"],
             format = config["format"],
-            custom_DB_folder = expand("{ref_dir}/annot/custom_new2",ref_dir = reference_directory)[0],
-            anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])[0],
+            custom_DB_folder = config["organism_custom_DB_folder"],
+            anno_gtf = config["organism_gtf"],
             isWGS=config["lib_ROI"]
     conda:  "../wrappers/custom_annotation/env.yaml"
     script: "../wrappers/custom_annotation/script.py"

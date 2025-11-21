@@ -6,7 +6,7 @@ Sys.setenv("R_ZIPCMD" = "zip")
 
 #DEFINE EXTRACTED DBs from Existing_variation vector
 extracted_DBs <<- c("snpDB","COSMIC","HGMD","NHLBI_ESP")
-extracted_DBs_IDs <<- c("rs","COSM","^[CHB][IMSGXDRP][0-9]+$","ESP")
+extracted_DBs_IDs <<- c("rs","COS[VM]","^[CHB][IMSGXDRP][0-9]+$","ESP")
 
 aa_names_tab <<- data.table(three = c("Ala" ,"Arg", "Asn" ,"Asp", "Cys", "Glu", "Gln", "Gly" ,"His" ,"Ile", "Leu", "Lys", "Met", "Phe", "Pro", "Ser" ,"Thr", "Trp" ,"Tyr" ,"Val",".fs.*","Ter"),
                             one = c("A", "R","N" ,"D" ,"C","E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V","fs","X"))
@@ -188,7 +188,7 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
     }
     
     if(any(names(annot_tab) == "CLIN_SIG")){
-      load(paste0(custom_DB_folder,"/clinvar.Rdata"))
+      clinvar_tab <- fread(paste0(custom_DB_folder,"/clinvar_annot.tsv"))
       annot_tab <- merge(annot_tab,clinvar_tab,by = "var_name",all.x = T)
       annot_tab[,CLIN_SIG := NULL]
     }
@@ -234,7 +234,8 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
     consequence_tab <- fread(paste0(resources_dir,"/consequences_tab.tsv"),header = F)
     consequence_tab[,consequence_index := seq_along(V1)]
     consequence_map <- data.table(Consequence = unique(annot_tab$Consequence),V1 = sapply(strsplit(unique(annot_tab$Consequence),","),head,1))
-    consequence_map <- merge(consequence_map,consequence_tab[,list(V1,consequence_index)],by = "V1")
+    ##  all.x=TRUE 28.7.2025 change to include ALL variants, not only those neccessary in the consequences_tab.tsv
+    consequence_map <- merge(consequence_map,consequence_tab[,list(V1,consequence_index)],by = "V1", all.x=TRUE)
     annot_tab <- merge(annot_tab,consequence_map[,list(Consequence,consequence_index)],by = "Consequence")
     annot_tab[,specific_transcript := Feature %in% gene_trans_spec]
     
@@ -251,8 +252,15 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
     
     annot_tab[,non_protein_coding_to_remove := non_protein_to_remove(is_protein_coding),by = c("var_name")]
     annot_tab <- annot_tab[non_protein_coding_to_remove == F]
-    
-    columns_to_order <- c("specific_transcript","is_protein_coding","SOURCE","consequence_index","CANONICAL")
+
+    if (ref_name == "GRCh38") {
+      annot_tab[, MANE_PRESENT := ifelse(MANE_SELECT == ".", "no", "yes")]
+      columns_to_order <- c("specific_transcript","is_protein_coding","MANE_PRESENT","consequence_index","CANONICAL")  
+    } else {
+      annot_tab[, MANE_SELECT := "."]
+      columns_to_order <- c("specific_transcript","is_protein_coding","SOURCE","consequence_index","CANONICAL")  
+    }                                       
+                                       
     order_direction <- c(-1,-1,-1,1,-1)
     order_direction <- order_direction[columns_to_order %in% names(annot_tab)]
     columns_to_order <- columns_to_order[columns_to_order %in% names(annot_tab)]
@@ -335,7 +343,7 @@ run_all <- function(args){
   format_file <- args[7]
   
   
-  ref_name <- gsub("\\-.*","",ref_name)
+#   ref_name <- gsub("\\-.*","",ref_name)
   
   col_config <- fread(format_file,skip = "orig_name")
   # add gnomad WGS column to format
