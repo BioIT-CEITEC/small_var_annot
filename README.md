@@ -31,23 +31,21 @@ The workflow uses a local *config.json* file, which is further extended using sh
   Specifies whether tumor–normal paired samples are used.
 
 - `calling_type`  
-  Variant calling type. Supported values include `somatic` and `germline`.
+  Variant calling type, supported values include `somatic` and `germline`.
 
 - `format`  
   Output formatting scheme used for the final variant tables.
 
 ### Optional parameters
 - `use_cohort_data`  
-  If enabled, variants from previous experiments are loaded for cohort-level annotation.
-  Requires the file `cohort_data/cohort_variants.tsv`.
+  If enabled, variants from previous experiments are loaded for cohort-level annotation, requires the file `cohort_data/cohort_variants.tsv`.
 
 - `create_cohort_data`  
   If enabled, cohort-level variant information is generated from the current run
   and stored in `cohort_data/cohort_variants.tsv`.
 
 - `min_variant_frequency`  
-  Minimum variant frequency threshold used during variant filtering.
-  Default value is 0.
+  Minimum variant frequency threshold used during variant filtering, default value is 0.
 
 - `not_use_merged`
 
