@@ -27,6 +27,8 @@ run_all <- function(args){
   
   tab_to_print <- tab_to_print[,.(chromosome,start,end,allele,strand)]
 
+  # keep each variant only once - the same variant from multiple samples is annotated just once
+  tab_to_print <- unique(tab_to_print)
   setkey(tab_to_print)
   
   fwrite(tab_to_print,file = output_file,col.names = F,row.names = F,sep = "\t",quote = F)
